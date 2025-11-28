@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,11 +7,12 @@
     <style>
         /* --- 1. CORE VARIABLES & RESET --- */
         :root {
-            --bg-color: #f4f4f5; /* Light grey/slate background */
+            --bg-color: #f4f4f5;
             --text-color: #18181b;
             --accent-color: #000000;
             --phone-bezel: #1c1c1e;
-            --slate-screen: #000000;
+            --slate-bg: #000000;
+            --dock-bg: #1c1c1e;
         }
 
         * {
@@ -70,31 +71,30 @@
             margin-bottom: 40px;
         }
 
-        /* --- 4. INTERACTIVE PHONE DEMO --- */
+        /* --- 4. PHONE CHASSIS --- */
         .phone-wrapper {
             position: relative;
-            width: 320px;
-            height: 640px;
+            width: 340px; /* Slightly wider for modern look */
+            height: 680px;
             background: var(--phone-bezel);
-            border-radius: 40px;
+            border-radius: 50px;
             padding: 12px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             margin: 0 auto;
+            border: 4px solid #333; /* Side buttons hint */
         }
 
-        /* The Notch */
-        .phone-wrapper::before {
-            content: '';
+        /* Dynamic Island / Notch */
+        .notch {
             position: absolute;
-            top: 12px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 100px;
-            height: 25px;
-            background: var(--phone-bezel);
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-            z-index: 20;
+            height: 30px;
+            background: black;
+            border-radius: 20px;
+            z-index: 50;
         }
 
         .screen-container {
@@ -102,15 +102,30 @@
             width: 100%;
             height: 100%;
             background: white;
-            border-radius: 32px;
+            border-radius: 40px;
             overflow: hidden;
         }
 
-        /* The Slider Component */
         .comparison-slider {
             position: relative;
             width: 100%;
             height: 100%;
+        }
+
+        /* --- 5. SCREEN CONTENTS --- */
+        
+        /* Shared Status Bar */
+        .status-bar {
+            position: absolute;
+            top: 15px;
+            width: 100%;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 40;
+            color: white; /* Default to white for both screens */
         }
 
         .c-img {
@@ -122,60 +137,144 @@
             overflow: hidden;
         }
 
-        /* The 'Before' Screen (Colorful) */
+        /* === BEFORE SCREEN (Colorful/Chaotic) === */
         .img-before {
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            padding-top: 50px;
-            align-items: center;
+            /* Wallpaper Gradient matching Image 2 */
+            background: linear-gradient(180deg, #a1c4fd 0%, #c2e9fb 100%); 
+            padding-top: 60px;
         }
-        
-        .grid-apps {
+
+        .img-before .status-bar { color: #000; } /* Dark text for light wallpaper */
+
+        .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 15px 10px;
             padding: 20px;
-            width: 100%;
         }
+
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
         .app-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            /* Placeholder gradient colors for "distraction" */
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: #ddd;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .red { background: #ff4757; }
-        .blue { background: #1e90ff; }
-        .green { background: #2ed573; }
-        .yellow { background: #ffa502; }
-        .purple { background: #5352ed; }
 
-        /* The 'After' Screen (SLATE) */
-        .img-after {
-            background: var(--slate-screen);
-            width: 50%; /* Initial slider position */
-            border-right: 2px solid white;
+        .app-name {
+            font-size: 11px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Notification Badge */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: 2px;
+            background: #ff3b30;
             color: white;
-            z-index: 10;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.5);
+            font-weight: bold;
         }
 
-        .slate-ui {
-            padding-top: 60px;
-            padding-left: 20px;
-            font-family: monospace;
+        /* Colors for chaos */
+        .bg-red { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); }
+        .bg-blue { background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%); }
+        .bg-green { background: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%); }
+        .bg-yellow { background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%); }
+        .bg-black { background: #000; }
+        .bg-white { background: #fff; }
+
+        /* === AFTER SCREEN (SLATE / Image 1) === */
+        .img-after {
+            background: var(--slate-bg);
+            width: 50%; /* Initial slider state */
+            border-right: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Spacing between top icons and dock */
         }
         
-        .slate-ui h3 { font-size: 1.5rem; margin-bottom: 30px; font-weight: 400;}
-        .slate-item { 
-            font-size: 1.1rem; 
-            margin-bottom: 20px; 
-            opacity: 0.8; 
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            width: 80%;
+        .img-after .status-bar { color: #fff; }
+
+        /* Center Grid for SLATE */
+        .slate-center-grid {
+            margin-top: 100px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px 15px; /* Vertical gap 30, horizontal 15 */
+            justify-items: center;
         }
 
-        /* Slider Handle input overlay */
+        .slate-app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+        }
+
+        .slate-icon-box {
+            width: 60px;
+            height: 60px;
+            background: #2c2c2e; /* Dark grey */
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .slate-icon-box svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
+        .slate-label {
+            font-size: 12px;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        /* Dock for SLATE */
+        .slate-dock-container {
+            margin-bottom: 25px;
+            padding: 0 15px;
+        }
+
+        .slate-dock {
+            background: #1c1c1e; /* Dock color */
+            border-radius: 35px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slate-dock .slate-icon-box {
+            background: transparent; /* Icons in dock have no background box in Image 1 style, or dark box? Image 1 has dark boxes. */
+            background: #2c2c2e;
+            margin-bottom: 0;
+            width: 52px;
+            height: 52px;
+        }
+
+
+        /* --- 6. SLIDER MECHANICS --- */
         input[type="range"] {
             -webkit-appearance: none;
             position: absolute;
@@ -188,37 +287,34 @@
             cursor: ew-resize;
             margin: 0;
         }
-        /* Remove default slider thumb styling */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 640px;
-            width: 40px; /* Width of the draggable area */
+            height: 680px;
+            width: 40px;
             background: transparent;
         }
-        
-        /* The visible handle graphic */
+
         .slider-handle-icon {
             position: absolute;
             top: 50%;
-            left: 50%; /* Dynamic via JS */
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             background: white;
             border-radius: 50%;
             z-index: 25;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            pointer-events: none; /* Let clicks pass to input */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
         .slider-handle-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: #000;
+            width: 20px; height: 20px; fill: #000;
         }
 
+        /* --- 7. OTHER SECTIONS --- */
         .slider-instruction {
             margin-top: 20px;
             font-size: 0.8rem;
@@ -227,84 +323,34 @@
             opacity: 0.5;
         }
 
-        /* --- 5. HOW IT WORKS (Timeline) --- */
         .steps-section {
             background: white;
             border-top: 1px solid #e4e4e7;
             border-bottom: 1px solid #e4e4e7;
         }
-
         .step-container {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 40px;
         }
-
         .step {
-            flex: 1;
-            min-width: 250px;
-            text-align: left;
-            padding: 20px;
-            border: 1px solid #f4f4f5;
-            border-radius: 12px;
-            transition: transform 0.2s;
+            flex: 1; min-width: 250px; padding: 20px;
+            border: 1px solid #f4f4f5; border-radius: 12px; transition: transform 0.2s;
         }
-
-        .step:hover {
-            transform: translateY(-5px);
-            border-color: #d4d4d8;
-        }
-
-        .step-number {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #a1a1aa;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-
-        .step h3 {
-            margin-bottom: 10px;
-        }
-
-        /* --- 6. CTA SECTION --- */
-        .cta-section {
-            text-align: center;
-            padding: 100px 0;
-        }
-
-        .btn-primary {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 16px 32px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: opacity 0.2s;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.8;
-        }
+        .step:hover { transform: translateY(-5px); border-color: #d4d4d8; }
+        .step-number { font-size: 0.9rem; font-weight: 700; color: #a1a1aa; margin-bottom: 10px; text-transform: uppercase; }
         
-        .price {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #71717a;
+        .cta-section { text-align: center; padding: 100px 0; }
+        .btn-primary {
+            display: inline-block; background-color: var(--accent-color); color: white;
+            padding: 16px 32px; border-radius: 8px; font-size: 1.1rem; font-weight: 600;
+            text-decoration: none; transition: opacity 0.2s;
         }
+        .btn-primary:hover { opacity: 0.8; }
+        .price { margin-top: 15px; font-size: 0.9rem; color: #71717a; }
+        footer { text-align: center; padding: 40px; font-size: 0.8rem; color: #a1a1aa; }
 
-        /* --- 7. FOOTER --- */
-        footer {
-            text-align: center;
-            padding: 40px;
-            font-size: 0.8rem;
-            color: #a1a1aa;
-        }
-
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .step-container { flex-direction: column; }
@@ -322,32 +368,104 @@
             <br>
 
             <div class="phone-wrapper">
+                <div class="notch"></div>
                 <div class="screen-container">
+                    
                     <div class="comparison-slider">
                         
                         <div class="c-img img-before">
-                            <div style="font-weight: bold; margin-bottom: 20px; color: #333;">09:41</div>
-                            <div class="grid-apps">
-                                <div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div><div class="app-icon yellow"></div>
-                                <div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div>
-                                <div class="app-icon yellow"></div><div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div>
-                                <div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div><div class="app-icon yellow"></div>
-                                <div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div>
+                            <div class="status-bar">
+                                <span>10:38</span>
+                                <span>5G</span>
                             </div>
-                            <div style="width: 90%; background: #f0f0f0; padding: 10px; border-radius: 12px; margin-top: 10px; font-size: 0.8rem; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                                <strong>Social App</strong><br>Someone liked your post...
+                            
+                            <div class="app-grid">
+                                <div class="app-item"><div class="app-icon bg-yellow"></div><span class="app-name">Shop</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Food</span><div class="badge">3</div></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Delivery</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Eats</span></div>
+                                <div class="app-item"><div class="app-icon bg-blue"></div><span class="app-name">Social</span><div class="badge">12</div></div>
+                                <div class="app-item"><div class="app-icon bg-green"></div><span class="app-name">Grocer</span></div>
+                                <div class="app-item"><div class="app-icon bg-white"></div><span class="app-name">Gift</span></div>
+                                <div class="app-item"><div class="app-icon bg-yellow"></div><span class="app-name">Prime</span></div>
+                                <div class="app-item"><div class="app-icon bg-black"></div><span class="app-name">TV</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Play</span></div>
+                                <div class="app-item"><div class="app-icon bg-black"></div><span class="app-name">N-Flix</span></div>
+                                <div class="app-item"><div class="app-icon bg-black"></div><span class="app-name">AppleTV</span></div>
+                                <div class="app-item"><div class="app-icon bg-blue"></div><span class="app-name">Pizza</span><div class="badge">1</div></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Cinema</span></div>
+                                <div class="app-item"><div class="app-icon bg-blue"></div><span class="app-name">Video</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Music</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">Music</span></div>
+                                <div class="app-item"><div class="app-icon bg-green"></div><span class="app-name">Spotify</span></div>
+                                <div class="app-item"><div class="app-icon bg-red"></div><span class="app-name">YouTube</span><div class="badge">9</div></div>
+                                <div class="app-item"><div class="app-icon bg-yellow"></div><span class="app-name">Files</span></div>
                             </div>
                         </div>
 
                         <div class="c-img img-after" id="after-image">
-                            <div class="slate-ui">
-                                <h3>SLATE</h3>
-                                <div class="slate-item">Phone</div>
-                                <div class="slate-item">Maps</div>
-                                <div class="slate-item">Notes</div>
-                                <div class="slate-item">Spotify</div>
-                                <div style="margin-top: 100px; font-size: 0.8rem; opacity: 0.5;">No notifications</div>
+                            
+                            <div class="status-bar">
+                                <span>9:41</span>
+                                <svg width="24" height="12" viewBox="0 0 24 12" fill="white"><rect x="1" y="1" width="18" height="10" rx="2" stroke="white" stroke-width="1"/><rect x="3" y="3" width="14" height="6" fill="white"/><path d="M22 4v4" stroke="white" stroke-width="2"/></svg>
                             </div>
+
+                            <div class="slate-center-grid">
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/><path d="M12 6v6l4 2" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                    <span class="slate-label">Clock</span>
+                                </div>
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><path d="M9 18l-7 4V6l7-4 8 4 7-4v16l-7 4-8-4z" fill="none" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                    <span class="slate-label">Maps</span>
+                                </div>
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="none" stroke="white" stroke-width="2"/><line x1="7" y1="8" x2="17" y2="8" stroke="white" stroke-width="2"/><line x1="7" y1="12" x2="17" y2="12" stroke="white" stroke-width="2"/><line x1="7" y1="16" x2="13" y2="16" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                    <span class="slate-label">Notes</span>
+                                </div>
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" fill="white"/></svg>
+                                    </div>
+                                    <span class="slate-label">Phone</span>
+                                </div>
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="white"/></svg>
+                                    </div>
+                                    <span class="slate-label">Messages</span>
+                                </div>
+                                <div class="slate-app">
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="white" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1.51 1H15a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" fill="none" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                    <span class="slate-label">Settings</span>
+                                </div>
+                            </div>
+
+                            <div class="slate-dock-container">
+                                <div class="slate-dock">
+                                     <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" fill="white"/></svg>
+                                    </div>
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="white"/></svg>
+                                    </div>
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" fill="none" stroke="white" stroke-width="2"/><circle cx="12" cy="13" r="4" fill="none" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                    <div class="slate-icon-box">
+                                        <svg viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M9 18V5l12-2v13" fill="none" stroke="white" stroke-width="2"/><circle cx="6" cy="18" r="3" fill="none" stroke="white" stroke-width="2"/><circle cx="18" cy="16" r="3" fill="none" stroke="white" stroke-width="2"/></svg>
+                                    </div>
+                                </div>
+                             </div>
+
                         </div>
 
                         <input type="range" min="0" max="100" value="50" id="slider" oninput="moveSlider()">
@@ -367,20 +485,17 @@
     <section class="steps-section">
         <div class="container">
             <h2 style="text-align: center; margin-bottom: 60px;">How it Works</h2>
-            
             <div class="step-container">
                 <div class="step">
                     <div class="step-number">Step 01</div>
                     <h3>Download on Mac</h3>
                     <p>Get the SLATE desktop companion app. This serves as the control center for your device management.</p>
                 </div>
-
                 <div class="step">
                     <div class="step-number">Step 02</div>
                     <h3>Connect & Supervise</h3>
                     <p>Plug your iPhone in. Our guide walks you through enabling MDM supervision. It takes 2 minutes.</p>
                 </div>
-
                 <div class="step">
                     <div class="step-number">Step 03</div>
                     <h3>Shift Mode</h3>
@@ -394,9 +509,7 @@
         <div class="container">
             <h2>Ready to go dumb?</h2>
             <p style="margin: 20px 0;">One time purchase. No subscription. Forever focused.</p>
-            
             <a href="https://stripe.com" class="btn-primary">Get SLATE for $99</a>
-            
             <div class="price">Includes Mac App + Lifetime Updates</div>
         </div>
     </section>
@@ -409,14 +522,8 @@
 
     <script>
         function moveSlider() {
-            // 1. Get the value of the invisible range input
             const sliderValue = document.getElementById("slider").value;
-            
-            // 2. Adjust the width of the "After" image container
-            // The "After" image is on top, so changing width reveals/hides it
             document.getElementById("after-image").style.width = sliderValue + "%";
-            
-            // 3. Move the visible handle icon to match
             document.getElementById("slider-handle").style.left = sliderValue + "%";
         }
     </script>
