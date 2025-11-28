@@ -105,7 +105,7 @@
             background: white;
             border-radius: 40px;
             overflow: hidden;
-            cursor: col-resize; /* Hint to user they can slide */
+            cursor: col-resize;
         }
 
         .comparison-slider {
@@ -116,7 +116,6 @@
 
         /* --- 5. SCREEN CONTENTS --- */
         
-        /* Shared Status Bar Styles */
         .status-bar {
             position: absolute;
             top: 14px;
@@ -141,14 +140,13 @@
 
         /* === BEFORE SCREEN (Colorful/Chaotic) === */
         .img-before {
-            /* Approximating the Orange -> Blue Gradient from the screenshot */
             background: linear-gradient(180deg, 
                 #FF512F 0%, 
                 #F09819 25%, 
                 #4facfe 50%, 
                 #00f2fe 75%, 
                 #005BEA 100%);
-            padding-top: 50px;
+            padding-top: 55px; /* Pushed down slightly */
         }
 
         .img-before .status-bar { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); } 
@@ -156,7 +154,8 @@
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px 10px; /* Tighter spacing matches screenshot */
+            /* Increased gap to spacing out icons like the screenshot */
+            gap: 22px 12px; 
             padding: 15px 18px;
         }
 
@@ -167,13 +166,13 @@
             position: relative;
         }
 
-        /* Real Icon Styling */
+        /* Real Icon Styling - RESIZED SMALLER */
         .app-icon-img {
-            width: 58px;
-            height: 58px;
-            border-radius: 13px;
+            width: 53px; /* Reduced from 58px */
+            height: 53px;
+            border-radius: 12px;
             object-fit: cover;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.15);
             background: white;
         }
@@ -187,29 +186,13 @@
             white-space: nowrap;
         }
 
-        .badge {
-            position: absolute;
-            top: -6px;
-            right: 2px;
-            background: #ff3b30;
-            color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            min-width: 18px;
-            text-align: center;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.8);
-            font-weight: bold;
-            z-index: 2;
-        }
-
-        /* The iOS Dock on the distracted screen */
+        /* Dock Styling */
         .distracted-dock {
             position: absolute;
             bottom: 22px;
             left: 14px;
             right: 14px;
-            height: 88px;
+            height: 85px;
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
@@ -221,19 +204,19 @@
         }
 
         .distracted-dock .app-item .app-name {
-            display: none; /* No labels in dock */
+            display: none;
         }
 
         /* === AFTER SCREEN (SLATE) === */
         .img-after {
             background: var(--slate-bg);
-            width: 50%; /* Initial state */
+            width: 50%;
             border-right: 1px solid rgba(255,255,255,0.2);
             z-index: 10;
         }
 
         .fixed-content {
-            width: 316px; /* Exact width of the screen container inside the padding */
+            width: 316px;
             height: 100%;
             position: relative;
             display: flex;
@@ -296,7 +279,7 @@
             background: #2c2c2e; margin-bottom: 0; width: 52px; height: 52px;
         }
 
-        /* --- 6. SLIDER HANDLE --- */
+        /* --- SLIDER HANDLE --- */
         .slider-handle-icon {
             position: absolute;
             top: 50%;
@@ -317,7 +300,7 @@
             width: 20px; height: 20px; fill: #000;
         }
 
-        /* --- 7. OTHER SECTIONS --- */
+        /* --- OTHER SECTIONS --- */
         .slider-instruction {
             margin-top: 20px; font-size: 0.8rem; text-transform: uppercase;
             letter-spacing: 1px; opacity: 0.5;
@@ -383,37 +366,37 @@
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="app-icon-img" alt="Telegram"><span class="app-name">Telegram</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="app-icon-img" alt="WhatsApp"><span class="app-name">WhatsApp</span></div>
 
-                                <div class="app-item"><img src="https://cdn.icon-icons.com/icons2/2699/PNG/512/halide_mark_ii_logo_icon_168864.png" class="app-icon-img" alt="Halide" style="background:#111"><span class="app-name">Halide</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" class="app-icon-img" alt="Halide" style="background:#111; filter: brightness(0.5);"><span class="app-name">Halide</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" class="app-icon-img" alt="Instagram"><span class="app-name">Instagram</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b6/Adobe_Photoshop_Lightroom_CC_logo.svg" class="app-icon-img" alt="Lightroom"><span class="app-name">Lightroom</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Photos_iOS_icon.svg" class="app-icon-img" alt="Photos"><span class="app-name">Photos</span></div>
 
-                                <div class="app-item"><img src="https://cdn.icon-icons.com/icons2/2389/PNG/512/apollo_logo_icon_144983.png" class="app-icon-img" alt="Apollo"><span class="app-name">Apollo</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" class="app-icon-img" alt="Apollo" style="background:white; padding: 5px;"><span class="app-name">Apollo</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" class="app-icon-img" alt="Twitter" style="background:#1DA1F2; padding:8px;"><span class="app-name">Twitter</span></div>
-                                <div class="app-item"><img src="https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/05/9a/c0/059ac04d-e99d-8386-3531-158a2d33453b/AppIcon-1x_U007emarketing-0-6-0-85-220.png/230x0w.webp" class="app-icon-img" alt="Reeder"><span class="app-name">Reeder</span></div>
-                                <div class="app-item"><img src="https://cdn.dribbble.com/users/1585671/screenshots/11261184/morning-app-icon.png" class="app-icon-img" alt="Morning"><span class="app-name">Morning</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Feed-icon.svg" class="app-icon-img" alt="Reeder" style="padding: 5px; background:white;"><span class="app-name">Reeder</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Sun_icon.svg/1024px-Sun_icon.svg.png" class="app-icon-img" alt="Morning" style="background:white; padding:5px;"><span class="app-name">Morning</span></div>
 
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Apple_Notes_icon.png" class="app-icon-img" alt="Notes"><span class="app-name">Notes</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" class="app-icon-img" alt="Formula 1" style="background:white; padding:10px;"><span class="app-name">Formula 1</span></div>
-                                <div class="app-item"><img src="https://images.crunchbase.com/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/v1486716075/j2cxx6142x44f1p9j8d8.png" class="app-icon-img" alt="Mimo"><span class="app-name">Mimo</span></div>
-                                <div class="app-item"><img src="https://is1-ssl.mzstatic.com/image/thumb/Purple116/v4/c3/00/01/c3000100-c049-34dc-5c79-c70579e0018f/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/230x0w.webp" class="app-icon-img" alt="CoinKeeper"><span class="app-name">CoinKeeper</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" class="app-icon-img" alt="Mimo" style="background:white; padding:8px;"><span class="app-name">Mimo</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Gold_coin_icon.png/1200px-Gold_coin_icon.png" class="app-icon-img" alt="CoinKeeper" style="background:white; padding:5px;"><span class="app-name">CoinKeeper</span></div>
 
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="app-icon-img" alt="YouTube" style="background:white;"><span class="app-name">YouTube</span></div>
-                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Audible_logo.svg" class="app-icon-img" alt="Audible" style="background:#F7941E; padding:5px;"><span class="app-name">Audible</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Audible_logo.svg/1024px-Audible_logo.svg.png" class="app-icon-img" alt="Audible" style="background:#F7941E; padding:5px;"><span class="app-name">Audible</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" class="app-icon-img" alt="Spotify"><span class="app-name">Spotify</span></div>
-                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/en/2/23/Overcast_Icon.png" class="app-icon-img" alt="Overcast"><span class="app-name">Overcast</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Podcasts_%28iOS%29.svg/1024px-Podcasts_%28iOS%29.svg.png" class="app-icon-img" alt="Overcast"><span class="app-name">Overcast</span></div>
 
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Revolut_App_Icon.png" class="app-icon-img" alt="Revolut"><span class="app-name">Revolut</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Apple_Books_Icon.png" class="app-icon-img" alt="Books"><span class="app-name">Books</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Pocket_Logo.svg" class="app-icon-img" alt="Pocket" style="padding:10px; background:#EF4056; filter:invert(1);"><span class="app-name">Pocket</span></div>
-                                <div class="app-item"><img src="https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/a4/09/e5/a409e53a-c322-04e4-f3c5-95079a49f531/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/512x512bb.jpg" class="app-icon-img" alt="Ulysses"><span class="app-name">Ulysses</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Pen_icon.svg/1024px-Pen_icon.svg.png" class="app-icon-img" alt="Ulysses" style="background:white; padding:8px;"><span class="app-name">Ulysses</span></div>
                             </div>
 
                             <div class="distracted-dock">
-                                <div class="app-item"><img src="https://cdn.icon-icons.com/icons2/2389/PNG/512/obscura_camera_logo_icon_144943.png" class="app-icon-img" alt="Camera"><span class="app-name">Camera</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" class="app-icon-img" alt="Camera"><span class="app-name">Camera</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" class="app-icon-img" alt="Messages"><span class="app-name">Messages</span></div>
                                 <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Asana_logo.svg" class="app-icon-img" alt="Asana" style="background:white; padding:10px;"><span class="app-name">Asana</span></div>
-                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Safari_browser_logo.svg" class="app-icon-img" alt="Safari"><span class="app-name">Safari</span></div>
+                                <div class="app-item"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" class="app-icon-img" alt="Safari" style="background:white;"><span class="app-name">Safari</span></div>
                             </div>
                         </div>
 
