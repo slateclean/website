@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLATE | Return to Focus</title>
+    <style>
+        /* --- 1. CORE VARIABLES & RESET --- */
+        :root {
+            --bg-color: #f4f4f5; /* Light grey/slate background */
+            --text-color: #18181b;
+            --accent-color: #000000;
+            --phone-bezel: #1c1c1e;
+            --slate-screen: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- 2. LAYOUT UTILITIES --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        h1, h2, h3 {
+            letter-spacing: -0.03em;
+            font-weight: 700;
+        }
+
+        p {
+            color: #52525b;
+            font-size: 1.1rem;
+        }
+
+        /* --- 3. HERO SECTION --- */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-top: 60px;
+            padding-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            max-width: 500px;
+            margin-bottom: 40px;
+        }
+
+        /* --- 4. INTERACTIVE PHONE DEMO --- */
+        .phone-wrapper {
+            position: relative;
+            width: 320px;
+            height: 640px;
+            background: var(--phone-bezel);
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            margin: 0 auto;
+        }
+
+        /* The Notch */
+        .phone-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 25px;
+            background: var(--phone-bezel);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 20;
+        }
+
+        .screen-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+        }
+
+        /* The Slider Component */
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .c-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* The 'Before' Screen (Colorful) */
+        .img-before {
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            padding-top: 50px;
+            align-items: center;
+        }
+        
+        .grid-apps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            width: 100%;
+        }
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            /* Placeholder gradient colors for "distraction" */
+        }
+        .red { background: #ff4757; }
+        .blue { background: #1e90ff; }
+        .green { background: #2ed573; }
+        .yellow { background: #ffa502; }
+        .purple { background: #5352ed; }
+
+        /* The 'After' Screen (SLATE) */
+        .img-after {
+            background: var(--slate-screen);
+            width: 50%; /* Initial slider position */
+            border-right: 2px solid white;
+            color: white;
+            z-index: 10;
+        }
+
+        .slate-ui {
+            padding-top: 60px;
+            padding-left: 20px;
+            font-family: monospace;
+        }
+        
+        .slate-ui h3 { font-size: 1.5rem; margin-bottom: 30px; font-weight: 400;}
+        .slate-item { 
+            font-size: 1.1rem; 
+            margin-bottom: 20px; 
+            opacity: 0.8; 
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            width: 80%;
+        }
+
+        /* Slider Handle input overlay */
+        input[type="range"] {
+            -webkit-appearance: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 30;
+            cursor: ew-resize;
+            margin: 0;
+        }
+        /* Remove default slider thumb styling */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 640px;
+            width: 40px; /* Width of the draggable area */
+            background: transparent;
+        }
+        
+        /* The visible handle graphic */
+        .slider-handle-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%; /* Dynamic via JS */
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            z-index: 25;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            pointer-events: none; /* Let clicks pass to input */
+        }
+        .slider-handle-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: #000;
+        }
+
+        .slider-instruction {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+        }
+
+        /* --- 5. HOW IT WORKS (Timeline) --- */
+        .steps-section {
+            background: white;
+            border-top: 1px solid #e4e4e7;
+            border-bottom: 1px solid #e4e4e7;
+        }
+
+        .step-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: left;
+            padding: 20px;
+            border: 1px solid #f4f4f5;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            border-color: #d4d4d8;
+        }
+
+        .step-number {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #a1a1aa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .step h3 {
+            margin-bottom: 10px;
+        }
+
+        /* --- 6. CTA SECTION --- */
+        .cta-section {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+        
+        .price {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #71717a;
+        }
+
+        /* --- 7. FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.8rem;
+            color: #a1a1aa;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .step-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Shift to SLATE.</h1>
+            <p>Your iPhone is a tool, not a toy. Remove the distractions, change the interface, and reclaim your attention span.</p>
+            
+            <div class="slider-instruction">Drag to compare</div>
+            <br>
+
+            <div class="phone-wrapper">
+                <div class="screen-container">
+                    <div class="comparison-slider">
+                        
+                        <div class="c-img img-before">
+                            <div style="font-weight: bold; margin-bottom: 20px; color: #333;">09:41</div>
+                            <div class="grid-apps">
+                                <div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div><div class="app-icon yellow"></div>
+                                <div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div>
+                                <div class="app-icon yellow"></div><div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div>
+                                <div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div><div class="app-icon yellow"></div>
+                                <div class="app-icon purple"></div><div class="app-icon red"></div><div class="app-icon blue"></div><div class="app-icon green"></div>
+                            </div>
+                            <div style="width: 90%; background: #f0f0f0; padding: 10px; border-radius: 12px; margin-top: 10px; font-size: 0.8rem; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                                <strong>Social App</strong><br>Someone liked your post...
+                            </div>
+                        </div>
+
+                        <div class="c-img img-after" id="after-image">
+                            <div class="slate-ui">
+                                <h3>SLATE</h3>
+                                <div class="slate-item">Phone</div>
+                                <div class="slate-item">Maps</div>
+                                <div class="slate-item">Notes</div>
+                                <div class="slate-item">Spotify</div>
+                                <div style="margin-top: 100px; font-size: 0.8rem; opacity: 0.5;">No notifications</div>
+                            </div>
+                        </div>
+
+                        <input type="range" min="0" max="100" value="50" id="slider" oninput="moveSlider()">
+                        
+                        <div class="slider-handle-icon" id="slider-handle">
+                            <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                            <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="steps-section">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 60px;">How it Works</h2>
+            
+            <div class="step-container">
+                <div class="step">
+                    <div class="step-number">Step 01</div>
+                    <h3>Download on Mac</h3>
+                    <p>Get the SLATE desktop companion app. This serves as the control center for your device management.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">Step 02</div>
+                    <h3>Connect & Supervise</h3>
+                    <p>Plug your iPhone in. Our guide walks you through enabling MDM supervision. It takes 2 minutes.</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">Step 03</div>
+                    <h3>Shift Mode</h3>
+                    <p>Click "Shift". Your colorful apps vanish, the UI turns minimal, and you get your brain back.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to go dumb?</h2>
+            <p style="margin: 20px 0;">One time purchase. No subscription. Forever focused.</p>
+            
+            <a href="https://stripe.com" class="btn-primary">Get SLATE for $99</a>
+            
+            <div class="price">Includes Mac App + Lifetime Updates</div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SLATE Systems. Built for focus.</p>
+        </div>
+    </footer>
+
+    <script>
+        function moveSlider() {
+            // 1. Get the value of the invisible range input
+            const sliderValue = document.getElementById("slider").value;
+            
+            // 2. Adjust the width of the "After" image container
+            // The "After" image is on top, so changing width reveals/hides it
+            document.getElementById("after-image").style.width = sliderValue + "%";
+            
+            // 3. Move the visible handle icon to match
+            document.getElementById("slider-handle").style.left = sliderValue + "%";
+        }
+    </script>
+
+</body>
+</html>
