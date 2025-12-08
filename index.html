@@ -39,73 +39,70 @@
 
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
-    /* --- CUSTOM SCROLLBAR --- */
+    /* --- SEGMENTED SCROLLBAR --- */
     .custom-scrollbar {
         position: fixed;
         right: 24px;
         top: 50%;
         transform: translateY(-50%);
-        height: 200px; /* Fixed height like the design reference */
+        height: 240px; 
         width: 6px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 999px;
         z-index: 1000;
-        backdrop-filter: blur(5px);
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* The gap between segments */
     }
 
-    .scroll-track {
+    .scroll-segment {
+        flex: 1; /* Distribute height equally */
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
         position: relative;
-        width: 100%;
-        height: 100%;
-        border-radius: 999px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+    
+    .scroll-segment:hover {
+        background: rgba(255, 255, 255, 0.2);
     }
 
-    .scroll-thumb {
+    /* The white fill inside the segment */
+    .segment-fill {
         position: absolute;
+        bottom: 0;
         left: 0;
         width: 100%;
-        height: 40px; /* Height of the moving pill */
+        height: 100%;
         background: #fff;
-        border-radius: 999px;
-        cursor: grab;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        transition: transform 0.1s linear; /* Smooth follow */
+        transform: translateY(100%); /* Start hidden (pushed down) */
+        transition: transform 0.1s linear; /* Smooth fill */
+        will-change: transform;
     }
 
-    .scroll-marker {
+    /* Tooltip/Label on Hover */
+    .scroll-segment::before {
+        content: attr(data-label);
         position: absolute;
-        right: 12px; /* Push out to the left of the bar */
-        top: 0; /* Set by JS */
-        width: auto;
-        height: 0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        pointer-events: auto;
-        cursor: pointer;
-        opacity: 0; /* Hidden by default, mapped by JS */
-        transform: translateY(-50%); /* Center on the point */
-        transition: opacity 0.3s;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #fff;
+        opacity: 0;
+        white-space: nowrap;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
 
-    /* The visual tick mark */
-    .scroll-marker::after {
-        content: '';
-        display: block;
-        width: 6px; 
-        height: 2px;
-        background: rgba(255,255,255,0.3);
-        border-radius: 2px;
-        transition: width 0.2s, background-color 0.2s;
+    .custom-scrollbar:hover .scroll-segment::before {
+        opacity: 0.5;
     }
-
-    .custom-scrollbar:hover .scroll-marker {
-        opacity: 1;
-    }
-
-    .scroll-marker:hover::after {
-        width: 12px;
-        background-color: #fff;
+    .scroll-segment:hover::before {
+        opacity: 1 !important;
     }
 
     /* --- HERO SECTION --- */
@@ -124,7 +121,6 @@
       flex-direction: column;
       align-items: center;
       justify-content: center; 
-      /* Gradient calculates based on progress, holding black at the end */
       background: radial-gradient(circle at 50% 50%, #1e293b calc(100% - (var(--scroll-progress) * 80%)), #000000 100%);
     }
 
@@ -135,20 +131,6 @@
       flex-shrink: 0;
       margin-bottom: 25px;
       margin-top: 40px;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #cbd5e1;
-      margin-bottom: 16px;
-      backdrop-filter: blur(10px);
     }
 
     .heading-swapper {
@@ -336,10 +318,9 @@
       transition: all 0.2s;
     }
     
-    /* Hover state for disabled button: Grays out and shows not-allowed cursor */
     .btn-buy:hover { 
-      background: #475569; /* Slate 600 */
-      color: #94a3b8; /* Muted text */
+      background: #475569; 
+      color: #94a3b8; 
       transform: none; 
       box-shadow: none; 
       cursor: not-allowed;
@@ -351,10 +332,8 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: 40px;
-      /* Removed the lines (::before, ::after) */
     }
 
-    /* Waitlist Input Group */
     .waitlist-group {
       max-width: 400px;
       margin: 0 auto;
@@ -396,11 +375,10 @@
       border-color: #94a3b8;
     }
 
-    /* Form Status Message */
     #form-status {
       margin-top: 15px;
       font-size: 0.9rem;
-      height: 20px; /* Prevent layout jump */
+      height: 20px; 
     }
     .status-success { color: #4ade80; }
     .status-error { color: #f87171; }
@@ -410,22 +388,34 @@
 </head>
 <body>
 
-  <div class="custom-scrollbar" id="customScrollbar">
-    <div class="scroll-track" id="scrollTrack">
-        <div class="scroll-thumb" id="scrollThumb"></div>
-        </div>
+  <div class="custom-scrollbar">
+    
+    <div class="scroll-segment" id="seg-chaos" data-label="Chaos" onclick="scrollToPercent(0)">
+        <div class="segment-fill"></div>
+    </div>
+
+    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToPercent(0.35)">
+        <div class="segment-fill"></div>
+    </div>
+
+    <div class="scroll-segment" id="seg-how" data-label="How it Works" onclick="scrollToTarget('section-content')">
+        <div class="segment-fill"></div>
+    </div>
+
+    <div class="scroll-segment" id="seg-join" data-label="Join" onclick="scrollToTarget('section-cta')">
+        <div class="segment-fill"></div>
+    </div>
+
   </div>
 
   <section class="hero" id="section-hero">
     <div class="hero-sticky">
       
       <div class="hero-content container"> 
-        
         <div class="heading-swapper">
             <h1 class="hero-title title-chaos">tired of distractions?</h1>
             <h1 class="hero-title title-slate">go DUMB with SLATE</h1>
         </div>
-
         <p class="hero-subtitle">
           reclaim your time and focus instantly.
         </p>
@@ -435,17 +425,14 @@
         <div class="phone-glow"></div>
         <div class="phone-device">
           <div class="dynamic-island"></div>
-          
           <div class="screen">
             <div class="layer-chaos">
               <img src="chaos.PNG" alt="Chaotic Home Screen" class="screen-img">
             </div>
-
             <div class="layer-slate">
               <img src="dumb.PNG" alt="Minimalist Home Screen" class="screen-img">
             </div>
           </div>
-
         </div>
       </div>
 
@@ -504,146 +491,129 @@
   </footer>
 
   <script>
-    // --- SCROLL ANIMATION LOOP ---
     const heroSection = document.querySelector('.hero');
+    const contentSection = document.getElementById('section-content');
+    const ctaSection = document.getElementById('section-cta');
     const root = document.documentElement;
 
-    function updateHeroAnimation() {
+    // Segment Elements
+    const segChaos = document.querySelector('#seg-chaos .segment-fill');
+    const segSlate = document.querySelector('#seg-slate .segment-fill');
+    const segHow = document.querySelector('#seg-how .segment-fill');
+    const segJoin = document.querySelector('#seg-join .segment-fill');
+
+    // SCROLL ANIMATION LOOP
+    function scrollLoop() {
       const scrollTop = window.scrollY;
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
       
+      // --- 1. HERO ANIMATION MATH (Existing Logic) ---
+      // We use this to drive the phone changes
       let rawProgress = scrollTop / (heroHeight - viewportHeight);
       let visualProgress = rawProgress / 0.75;
-
       if (visualProgress < 0) visualProgress = 0;
       if (visualProgress > 1) visualProgress = 1;
-
       root.style.setProperty('--scroll-progress', visualProgress);
+
+      // --- 2. SEGMENT FILL LOGIC ---
+      
+      // SEGMENT 1: CHAOS (First half of hero animation)
+      // Maps visualProgress 0.0 -> 0.5 to 0% -> 100% fill
+      let chaosFill = (visualProgress / 0.5) * 100;
+      if(chaosFill > 100) chaosFill = 100;
+      if(chaosFill < 0) chaosFill = 0;
+      // Invert translate: 100% means hidden, 0% means full. 
+      // So if fill is 100%, translate is 0%.
+      segChaos.style.transform = `translateY(${100 - chaosFill}%)`;
+
+      // SEGMENT 2: FOCUS (Second half of hero animation)
+      // Maps visualProgress 0.5 -> 1.0 to 0% -> 100% fill
+      let slateFill = 0;
+      if(visualProgress > 0.5) {
+        slateFill = ((visualProgress - 0.5) / 0.5) * 100;
+      }
+      if(slateFill > 100) slateFill = 100;
+      segSlate.style.transform = `translateY(${100 - slateFill}%)`;
+
+      // SEGMENT 3: HOW IT WORKS
+      // Standard scroll progress for this section
+      const contentRect = contentSection.getBoundingClientRect();
+      const contentStart = contentRect.top - viewportHeight;
+      const contentEnd = contentRect.height;
+      
+      // Calculate % of section scrolled
+      let howProgress = 0;
+      if (contentRect.top < viewportHeight) {
+          // How far have we scrolled past the top entering view?
+          const scrolledPast = viewportHeight - contentRect.top;
+          // Normalize (making it fill up as you scroll through)
+          howProgress = (scrolledPast / (contentRect.height + viewportHeight/2)) * 100;
+      }
+      if(howProgress > 100) howProgress = 100;
+      if(howProgress < 0) howProgress = 0;
+      segHow.style.transform = `translateY(${100 - howProgress}%)`;
+
+      // SEGMENT 4: JOIN
+      const ctaRect = ctaSection.getBoundingClientRect();
+      let joinProgress = 0;
+      if (ctaRect.top < viewportHeight) {
+          const scrolledPast = viewportHeight - ctaRect.top;
+          joinProgress = (scrolledPast / ctaRect.height) * 100;
+      }
+      // Since it's the last section, ensure it hits 100% at bottom
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        joinProgress = 100;
+      }
+      
+      if(joinProgress > 100) joinProgress = 100;
+      if(joinProgress < 0) joinProgress = 0;
+      segJoin.style.transform = `translateY(${100 - joinProgress}%)`;
+
+      requestAnimationFrame(scrollLoop);
+    }
+    requestAnimationFrame(scrollLoop);
+
+    // --- CLICK TO SCROLL HELPERS ---
+    function scrollToTarget(id) {
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
 
-    // --- CUSTOM SCROLLBAR LOGIC ---
-    const scrollTrack = document.getElementById('scrollTrack');
-    const scrollThumb = document.getElementById('scrollThumb');
-    
-    function updateCustomScrollbar() {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight;
-        const winHeight = window.innerHeight;
-        
-        // Calculate scroll percentage
-        const scrollPercent = scrollTop / (docHeight - winHeight);
-        
-        // Calculate thumb position within the track
-        // We subtract thumb height (40px) to keep it inside the track
-        const trackHeight = scrollTrack.clientHeight;
-        const thumbHeight = scrollThumb.clientHeight;
-        const maxTop = trackHeight - thumbHeight;
-        
-        const thumbTop = scrollPercent * maxTop;
-        
-        scrollThumb.style.transform = `translateY(${thumbTop}px)`;
+    function scrollToPercent(pct) {
+        const heroHeight = heroSection.offsetHeight;
+        const targetY = heroHeight * pct;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
-
-    // --- MARKER GENERATION ---
-    // Automatically find sections and place markers
-    function createScrollMarkers() {
-        // Sections we want markers for
-        const sections = [
-            document.getElementById('section-hero'),
-            document.getElementById('section-content'),
-            document.getElementById('section-cta')
-        ];
-
-        const docHeight = document.documentElement.scrollHeight;
-        const trackHeight = scrollTrack.clientHeight;
-
-        sections.forEach(section => {
-            if(!section) return;
-
-            // Create marker element
-            const marker = document.createElement('div');
-            marker.className = 'scroll-marker';
-            
-            // Calculate relative position of section top
-            // Note: because the hero is huge (600vh), the markers will be spaced interestingly
-            const rect = section.getBoundingClientRect();
-            const absoluteTop = window.scrollY + rect.top;
-            
-            // Position on scrollbar (0 to 1)
-            const positionRatio = absoluteTop / docHeight;
-            
-            // Use percentage for top
-            marker.style.top = (positionRatio * 100) + '%';
-            
-            // Add Click Listener to scroll to section
-            marker.addEventListener('click', () => {
-                section.scrollIntoView({ behavior: 'smooth' });
-            });
-
-            scrollTrack.appendChild(marker);
-        });
-    }
-
-    // Initialize Markers
-    window.addEventListener('load', createScrollMarkers);
-    
-    // Update loops
-    function loop() {
-        updateHeroAnimation();
-        updateCustomScrollbar();
-        requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-
 
     // --- SCROLL REVEAL OBSERVER ---
-    const observerOptions = { threshold: 0.15 };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('active');
       });
-    }, observerOptions);
+    }, { threshold: 0.15 });
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    // --- FORMSPREE AJAX HANDLING ---
+    // --- FORMSPREE HANDLING ---
     const form = document.getElementById("waitlist-form");
-    
-    async function handleSubmit(event) {
-      event.preventDefault();
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       const status = document.getElementById("form-status");
-      const data = new FormData(event.target);
-      
-      fetch(event.target.action, {
-        method: form.method,
-        body: data,
-        headers: {
-            'Accept': 'application/json'
-        }
-      }).then(response => {
-        if (response.ok) {
-          status.innerHTML = "You're on the list! We'll be in touch shortly.";
-          status.className = "status-success";
-          form.reset();
+      const data = new FormData(e.target);
+      try {
+        const res = await fetch(e.target.action, { method: form.method, body: data, headers: {'Accept': 'application/json'} });
+        if (res.ok) {
+           status.innerHTML = "You're on the list!";
+           status.className = "status-success";
+           form.reset();
         } else {
-          response.json().then(data => {
-            if (Object.hasOwn(data, 'errors')) {
-              status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
-              status.className = "status-error";
-            } else {
-              status.innerHTML = "Oops! There was a problem submitting your form";
-              status.className = "status-error";
-            }
-          })
+           status.innerHTML = "Oops! Something went wrong.";
+           status.className = "status-error";
         }
-      }).catch(error => {
-        status.innerHTML = "Oops! There was a problem submitting your form";
+      } catch (err) {
+        status.innerHTML = "Oops! Connection error.";
         status.className = "status-error";
-      });
-    }
-    form.addEventListener("submit", handleSubmit);
+      }
+    });
   </script>
 
 </body>
