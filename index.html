@@ -21,15 +21,9 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-
-    /* HIDE DEFAULT SCROLLBAR */
     ::-webkit-scrollbar { display: none; }
     
-    html {
-        /* Removed scroll-snap for smoother GSAP control */
-        scroll-behavior: auto; /* Let GSAP handle smoothing */
-    }
-
+    html { scroll-behavior: auto; }
     body { 
         -ms-overflow-style: none;  
         scrollbar-width: none; 
@@ -42,69 +36,19 @@
 
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
 
-    /* --- SEGMENTED SCROLLBAR --- */
-    .custom-scrollbar {
-        position: fixed;
-        right: 24px;
-        top: 50%;
-        transform: translateY(-50%);
-        height: 240px; 
-        width: 6px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        gap: 6px; 
-    }
-
-    .scroll-segment {
-        flex: 1; 
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-    
-    .scroll-segment:hover { background: rgba(255, 255, 255, 0.2); }
-
-    .segment-fill {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: #fff;
-        transform: scaleY(0);
-        transform-origin: top center;
-        transition: transform 0.1s linear; 
-        will-change: transform;
-    }
-
-    .scroll-segment::before {
-        content: attr(data-label);
-        position: absolute;
-        right: 18px; top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.75rem; font-weight: 600;
-        color: #fff; opacity: 0;
-        white-space: nowrap; pointer-events: none;
-        transition: opacity 0.2s;
-        text-transform: uppercase; letter-spacing: 0.05em;
-    }
-
-    .custom-scrollbar:hover .scroll-segment::before { opacity: 0.5; }
-    .scroll-segment:hover::before { opacity: 1 !important; }
-
-    /* --- GLOBAL PHONE VISUAL (FIXED) --- */
-    /* This element sits on top of the site and moves via GSAP */
+    /* --- FIXED PHONE WRAPPER --- */
+    /* This sits on top of everything and transitions between sections */
     .phone-wrapper-fixed {
         position: fixed;
         top: 0; left: 0;
         width: 100%; height: 100vh;
-        z-index: 50; /* Above text initially, handled by layers */
-        pointer-events: none; /* Let clicks pass through */
+        z-index: 50; 
+        pointer-events: none;
         display: flex;
         align-items: center;
         justify-content: center;
+        /* Start slightly lower to clear the top text */
+        padding-top: 5vh; 
     }
 
     .phone-stage {
@@ -123,7 +67,6 @@
         width: 140%; height: 100%;
         background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
         filter: blur(50px);
-        opacity: 1; 
     }
 
     .phone-device {
@@ -162,43 +105,38 @@
     }
 
     .layer-chaos {
-        position: absolute; inset: 0;
-        z-index: 2; 
+        position: absolute; inset: 0; z-index: 2; 
     }
-
     .layer-slate {
-        position: absolute; inset: 0;
-        opacity: 0; /* Handled by GSAP now */
-        z-index: 3;
+        position: absolute; inset: 0; opacity: 0; z-index: 3;
     }
 
     /* --- HERO SECTION --- */
     .hero {
-      height: 100vh; /* Changed from 600vh, we use pinning now */
+      /* We start with 100vh, but GSAP pinning will add spacing automatically */
+      height: 100vh; 
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      /* Dynamic Background handled by GSAP */
+      /* Gradient that will animate */
       background: radial-gradient(circle at 50% 50%, #1e293b, #000000); 
       z-index: 10;
     }
 
     .hero-content {
       text-align: center;
-      z-index: 40; /* Above the phone initially */
-      margin-bottom: 25px;
-      /* Position absolute to center it exactly behind phone or above */
+      z-index: 40; 
+      /* Position text HIGH up so it is not covered by phone */
       position: absolute;
-      top: 15%;
+      top: 5%; 
       width: 100%;
     }
 
     .heading-swapper {
         display: grid;
         place-items: center;
-        height: 60px;
+        height: 80px; /* fixed height to prevent jumps */
         position: relative;
     }
 
@@ -218,7 +156,7 @@
 
     .title-slate {
         background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
-        opacity: 0; /* GSAP will handle */
+        opacity: 0; 
     }
 
     .hero-subtitle {
@@ -228,45 +166,39 @@
       color: #94a3b8;
     }
 
-    /* --- CONTENT SECTION (HOW IT WORKS) --- */
+    /* --- CONTENT SECTION --- */
     .content-section {
       position: relative;
       background: #f8fafc;
       color: #0f172a;
-      min-height: 150vh; /* Tall enough to scroll through */
+      min-height: 150vh; 
       padding: 120px 0;
       z-index: 40;
-      overflow: hidden; /* Keep content contained */
+      overflow: hidden; 
     }
 
     .split-layout {
         display: flex;
-        align-items: flex-start; /* Top align */
+        align-items: flex-start; 
         justify-content: space-between;
         margin-top: 60px;
     }
 
-    /* Left side holds the cards */
     .content-left {
         width: 45%;
         display: flex;
         flex-direction: column;
-        gap: 200px; /* Big gaps to create scroll distance */
-        padding-bottom: 200px; /* Space at bottom */
+        gap: 200px; 
+        padding-bottom: 200px;
     }
 
-    /* Right side is empty reserved for the Phone */
-    .content-right {
-        width: 50%;
-    }
+    .content-right { width: 50%; }
 
     .card {
       background: #fff; padding: 32px; border-radius: 24px;
       border: 1px solid #e2e8f0;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      /* Initial state for scroll reveal */
-      opacity: 0;
-      transform: translateY(30px);
+      opacity: 0; transform: translateY(30px);
     }
     
     .card h3 { font-size: 1.5rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
@@ -275,101 +207,35 @@
 
     /* --- CTA SECTION --- */
     .cta { 
-      background: #000; 
-      color: #fff; 
-      text-align: center; 
-      padding: 120px 0 160px; 
-      z-index: 60;
-      position: relative;
+      background: #000; color: #fff; 
+      text-align: center; padding: 120px 0 160px; 
+      z-index: 60; position: relative;
     }
-
     .btn-buy {
-      display: inline-block; 
-      margin-top: 30px;
-      margin-bottom: 50px;
-      background: #fff; 
-      color: #000;
-      padding: 18px 40px; 
-      border-radius: 999px;
-      text-decoration: none; 
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: all 0.2s;
+      display: inline-block; margin-top: 30px; margin-bottom: 50px;
+      background: #fff; color: #000; padding: 18px 40px; 
+      border-radius: 999px; text-decoration: none; font-weight: 600; font-size: 1.1rem;
     }
-    
-    .btn-buy:hover { 
-      background: #475569; 
-      color: #94a3b8; 
-      cursor: not-allowed;
-    }
-
-    .divider {
-      color: #334155;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 40px;
-    }
-
-    .waitlist-group {
-      max-width: 400px; margin: 0 auto;
-      display: flex; flex-direction: column; gap: 12px;
-    }
-
+    .waitlist-group { max-width: 400px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
     .waitlist-input {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 14px 20px;
-      border-radius: 12px;
-      color: #fff;
-      font-family: inherit; font-size: 1rem; outline: none;
-      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
+      padding: 14px 20px; border-radius: 12px; color: #fff; font-size: 1rem;
     }
-    .waitlist-input:focus { border-color: #38bdf8; background: rgba(255,255,255,0.12); }
-    
     .btn-waitlist {
-      background: #334155; color: #fff;
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 14px; border-radius: 12px;
-      font-weight: 600; cursor: pointer;
-      font-family: inherit; font-size: 1rem;
-      transition: all 0.2s;
+      background: #334155; color: #fff; border: 1px solid rgba(255,255,255,0.1);
+      padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem;
     }
-    .btn-waitlist:hover { background: #475569; border-color: #94a3b8; }
+    footer { background: #000; color: #475569; text-align: center; padding: 40px; font-size: 0.9rem; position: relative; z-index: 60; }
 
-    #form-status { margin-top: 15px; font-size: 0.9rem; height: 20px; }
-    .status-success { color: #4ade80; }
-    .status-error { color: #f87171; }
-
-    footer { background: #000; color: #475569; text-align: center; padding: 40px; border-top: 1px solid #1e293b; font-size: 0.9rem; position: relative; z-index: 60; }
-
-    /* --- MOBILE RESPONSIVENESS --- */
     @media (max-width: 768px) {
         .split-layout { flex-direction: column; }
         .content-left { width: 100%; gap: 40px; padding-bottom: 50px;}
         .content-right { display: none; }
         .hero-content { top: 10%; }
-        /* On mobile, we might want to disable the complex side animation */
     }
-
   </style>
 </head>
 <body>
-
-  <div class="custom-scrollbar">
-    <div class="scroll-segment" id="seg-chaos" data-label="Chaos" onclick="scrollToID('hero-trigger')">
-        <div class="segment-fill"></div>
-    </div>
-    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToID('hero-trigger')">
-        <div class="segment-fill"></div>
-    </div>
-    <div class="scroll-segment" id="seg-how" data-label="How it Works" onclick="scrollToID('section-content')">
-        <div class="segment-fill"></div>
-    </div>
-    <div class="scroll-segment" id="seg-join" data-label="Join" onclick="scrollToID('section-cta')">
-        <div class="segment-fill"></div>
-    </div>
-  </div>
 
   <div class="phone-wrapper-fixed">
       <div class="phone-stage" id="global-phone">
@@ -388,9 +254,7 @@
       </div>
   </div>
 
-  <div id="hero-trigger" style="height: 200vh; position: absolute; top:0; left:0; width:100%; pointer-events:none;"></div>
-  
-  <section class="hero" id="hero-visuals">
+  <section class="hero" id="hero-section">
       <div class="hero-content container" id="hero-text"> 
         <div class="heading-swapper">
             <h1 class="hero-title title-chaos" id="text-chaos">tired of distractions?</h1>
@@ -436,20 +300,15 @@
   <section class="cta" id="section-cta">
     <div class="container reveal-cta">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
-      <p style="color:#94a3b8;">One-time purchase. Lifetime focus.</p>
-      
       <a href="#" class="btn-buy" onclick="return false;">Get SLATE for $99</a>
-
-      <div class="divider">or join waitlist</div>
+      
+      <div class="divider" style="margin: 30px 0; color:#555; font-size:0.8rem; text-transform:uppercase;">or join waitlist</div>
 
       <form id="waitlist-form" action="https://formspree.io/f/mrbnaykd" method="POST" class="waitlist-group">
         <input type="text" name="name" class="waitlist-input" placeholder="Your Name" required>
         <input type="email" name="email" class="waitlist-input" placeholder="email@address.com" required>
         <button type="submit" class="btn-waitlist">Join Waitlist Now</button>
       </form>
-      
-      <p id="form-status"></p>
-
     </div>
   </section>
 
@@ -460,60 +319,54 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    // --- 1. HERO ANIMATION (CHAOS -> FOCUS) ---
-    // We create a timeline that is scrubbed by scrolling through #hero-trigger
+    // --- PHASE 1: HERO TRANSFORMATION (PINNED) ---
+    // The user scrolls, but the page stays put while the animation happens.
     const heroTl = gsap.timeline({
         scrollTrigger: {
-            trigger: "#hero-trigger",
+            trigger: ".hero",
             start: "top top",
-            end: "bottom bottom",
-            scrub: 1, // Smoothness
+            end: "+=1500", // Length of the 'pause' to let animation finish
+            pin: true,     // Locks the section in place
+            scrub: 1,      // Smooth scrubbing
         }
     });
 
-    // Animate Text Crossfade
+    // Animate Text & Screen Crossfade
     heroTl.to("#text-chaos", { opacity: 0, scale: 0.9, filter: "blur(10px)", duration: 1 }, 0)
           .to("#text-slate", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1 }, 0.5)
-          .to("#hero-visuals", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0); // Darken BG
-
-    // Animate Phone Screen Crossfade
-    heroTl.to("#screen-chaos", { opacity: 0, filter: "blur(10px)", duration: 1 }, 0)
+          .to("#hero-section", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0)
+          .to("#screen-chaos", { opacity: 0, filter: "blur(5px)", duration: 1 }, 0)
           .to("#screen-slate", { opacity: 1, filter: "blur(0px)", duration: 1 }, 0.5)
-          .to("#phone-glow", { opacity: 0, duration: 1 }, 0); // Remove glow
+          .to("#phone-glow", { opacity: 0, duration: 1 }, 0);
 
 
-    // --- 2. TRANSITION ANIMATION (CENTER -> RIGHT) ---
-    // As we scroll out of Hero and into Content
+    // --- PHASE 2: MOVEMENT TO RIGHT ---
+    // This happens AFTER the Hero unpins and the "Content" section enters view.
     const moveTl = gsap.timeline({
         scrollTrigger: {
             trigger: "#section-content",
-            start: "top bottom", // When content section hits bottom of viewport
-            end: "top center",   // When content section hits center
-            scrub: 1.5,
+            start: "top bottom", // Start when content section appears at bottom of screen
+            end: "top top",      // End when content section hits top of screen
+            scrub: 1,
         }
     });
 
-    // 1. Move Phone to Right
+    // Move Phone Center -> Right
     moveTl.to("#global-phone", {
-        x: "25vw", // Move to the right quarter of screen
-        y: "10vh", // Move down slightly
-        scale: 0.85, // Shrink slightly
-        rotation: -2, // Slight tilt for style
+        x: "25vw",      // Move right
+        y: "10vh",      // Move down slightly to center in the white space
+        scale: 0.85,    // Shrink
+        rotation: -2,
         ease: "power2.inOut"
     }, 0);
 
-    // 2. Fade out Hero Text so it doesn't overlap
-    moveTl.to("#hero-text", {
-        y: -100,
-        opacity: 0,
-        duration: 0.5
-    }, 0);
+    // Fade out Hero Text so it doesn't clutter the transition
+    moveTl.to("#hero-text", { opacity: 0, y: -50 }, 0);
 
 
-    // --- 3. REVEAL CARDS (HOW IT WORKS) ---
-    // Stagger the cards in the left column
+    // --- PHASE 3: CARD REVEALS ---
     const cards = document.querySelectorAll('.step-card');
-    cards.forEach((card, i) => {
+    cards.forEach((card) => {
         gsap.to(card, {
             scrollTrigger: {
                 trigger: card,
@@ -522,79 +375,20 @@
             },
             opacity: 1,
             y: 0,
-            duration: 0.8,
+            duration: 0.6,
             ease: "power2.out"
         });
     });
 
-    // --- 4. PHONE EXIT ---
-    // When we hit the CTA section, move the phone away
+    // --- PHASE 4: EXIT ---
     gsap.to("#global-phone", {
         scrollTrigger: {
             trigger: "#section-cta",
             start: "top bottom",
             scrub: 1
         },
-        y: "-150vh", // Fly up and away
+        y: "-120vh", // Fly out
         opacity: 0
-    });
-
-
-    // --- 5. SCROLLBAR LOGIC (Vanilla JS + GSAP Mix) ---
-    const segChaos = document.querySelector('#seg-chaos .segment-fill');
-    const segSlate = document.querySelector('#seg-slate .segment-fill');
-    const segHow = document.querySelector('#seg-how .segment-fill');
-    const segJoin = document.querySelector('#seg-join .segment-fill');
-
-    window.addEventListener('scroll', () => {
-        const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPos = window.scrollY;
-        const progress = scrollPos / docHeight;
-
-        // Simple mapping based on visual sections
-        // Chaos (0 - 0.15)
-        segChaos.style.transform = `scaleY(${Math.min(scrollPos / (window.innerHeight * 0.5), 1)})`;
-        
-        // Focus (0.15 - 0.3)
-        let focusProg = (scrollPos - (window.innerHeight * 0.5)) / (window.innerHeight * 0.5);
-        segSlate.style.transform = `scaleY(${Math.max(0, Math.min(focusProg, 1))})`;
-
-        // How (0.3 - 0.8)
-        const howSection = document.getElementById('section-content');
-        let howProg = (scrollPos - howSection.offsetTop + window.innerHeight) / howSection.offsetHeight;
-        segHow.style.transform = `scaleY(${Math.max(0, Math.min(howProg, 1))})`;
-
-        // Join (End)
-        const ctaSection = document.getElementById('section-cta');
-        let joinProg = (scrollPos - ctaSection.offsetTop + window.innerHeight) / ctaSection.offsetHeight;
-        segJoin.style.transform = `scaleY(${Math.max(0, Math.min(joinProg, 1))})`;
-    });
-
-    // Scroll Helper
-    function scrollToID(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // --- FORMSPREE HANDLING ---
-    const form = document.getElementById("waitlist-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const status = document.getElementById("form-status");
-      const data = new FormData(e.target);
-      try {
-        const res = await fetch(e.target.action, { method: form.method, body: data, headers: {'Accept': 'application/json'} });
-        if (res.ok) {
-           status.innerHTML = "You're on the list!";
-           status.className = "status-success";
-           form.reset();
-        } else {
-           status.innerHTML = "Oops! Something went wrong.";
-           status.className = "status-error";
-        }
-      } catch (err) {
-        status.innerHTML = "Oops! Connection error.";
-        status.className = "status-error";
-      }
     });
 
   </script>
