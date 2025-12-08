@@ -18,11 +18,12 @@
       --bg-dark: #020617;
       --text-white: #f8fafc;
       --text-muted: #94a3b8;
+      --accent: #fff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
     ::-webkit-scrollbar { display: none; }
-    html { scroll-behavior: auto; }
+    html { scroll-behavior: smooth; }
     
     body { 
         font-family: 'Inter', sans-serif;
@@ -33,7 +34,7 @@
 
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
 
-    /* --- CUSTOM SCROLLBAR (ADAPTIVE COLOR) --- */
+    /* --- CUSTOM SCROLLBAR --- */
     .custom-scrollbar {
         position: fixed;
         right: 30px;
@@ -44,7 +45,6 @@
         flex-direction: column;
         align-items: flex-end;
         gap: 12px;
-        transition: all 0.3s ease; /* Smooth color transition */
     }
 
     .sb-label {
@@ -55,7 +55,7 @@
         margin-bottom: 4px;
         color: var(--text-muted);
         opacity: 0.5;
-        transition: opacity 0.3s, color 0.3s;
+        transition: opacity 0.3s;
         text-align: right;
     }
 
@@ -66,19 +66,21 @@
         border-radius: 4px;
         position: relative;
         overflow: hidden;
-        transition: width 0.3s, background 0.3s;
+        transition: width 0.3s;
     }
 
+    .sb-segment.active .sb-label { opacity: 1; color: #fff; }
+    
     .sb-fill {
         position: absolute; top: 0; left: 0;
         width: 100%; height: 100%;
         background: #fff;
         transform: scaleY(0);
         transform-origin: top center;
-        transition: transform 0.1s linear, background 0.3s;
+        transition: transform 0.1s linear;
     }
 
-    /* Sub-segments */
+    /* Sub-segments container */
     .sb-group {
         display: flex;
         flex-direction: column;
@@ -89,27 +91,22 @@
 
     .sb-sub {
         width: 4px;
-        height: 15px;
+        height: 15px; /* Shorter bars for steps */
         background: rgba(255,255,255,0.1);
         border-radius: 4px;
         position: relative;
         overflow: hidden;
-        transition: background 0.3s;
     }
 
-    /* HOVER STATES */
-    .sb-wrap { display: flex; flex-direction: column; align-items: flex-end; cursor: pointer; }
+    /* Tooltip text on hover */
+    .sb-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        cursor: pointer;
+    }
     .sb-wrap:hover .sb-label { opacity: 1; }
     .sb-wrap:hover .sb-segment, .sb-wrap:hover .sb-sub { width: 6px; }
-
-    /* --- DARK MODE (Triggered in White Section) --- */
-    .custom-scrollbar.dark .sb-label { color: #0f172a; opacity: 0.4; }
-    .custom-scrollbar.dark .sb-wrap:hover .sb-label { opacity: 1; }
-    
-    .custom-scrollbar.dark .sb-segment, 
-    .custom-scrollbar.dark .sb-sub { background: rgba(0,0,0,0.1); }
-    
-    .custom-scrollbar.dark .sb-fill { background: #000; }
 
 
     /* --- FIXED PHONE --- */
@@ -160,64 +157,50 @@
     .layer-chaos { position: absolute; inset: 0; z-index: 2; }
     .layer-slate { position: absolute; inset: 0; opacity: 0; z-index: 3; }
 
-    /* --- HERO --- */
+    /* --- SECTIONS --- */
     .hero {
-      height: 100vh; position: relative;
+      height: 100vh; 
+      position: relative;
       display: flex; flex-direction: column; align-items: center;
       background: radial-gradient(circle at 50% 50%, #1e293b, #000000); 
       z-index: 10;
     }
+
     .hero-content {
-      text-align: center; z-index: 40; position: absolute; top: 5%; width: 100%;
+      text-align: center;
+      z-index: 40; 
+      position: absolute; top: 5%; width: 100%;
     }
-    .heading-swapper { display: grid; place-items: center; height: 80px; }
+
+    .heading-swapper {
+        display: grid; place-items: center; height: 80px; position: relative;
+    }
+
     .hero-title {
-      grid-area: 1 / 1; font-size: clamp(2rem, 4vw, 3.5rem); 
+      grid-area: 1 / 1;
+      font-size: clamp(2rem, 4vw, 3.5rem); 
       line-height: 1.1; font-weight: 700; margin: 0;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
+
     .title-chaos { background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%); }
     .title-slate { background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%); opacity: 0; }
     .hero-subtitle { max-width: 480px; margin: 12px auto 0; font-size: 1.05rem; color: #94a3b8; }
 
-    /* --- CONTENT SECTION (HOW IT WORKS) --- */
+    /* Content */
     .content-section {
       position: relative; background: #f8fafc; color: #0f172a;
-      height: 100vh; /* Pinned height */
-      padding: 120px 0; z-index: 40; overflow: hidden; 
-      display: flex; flex-direction: column;
+      min-height: 150vh; padding: 120px 0; z-index: 40; overflow: hidden; 
     }
-    
-    .reveal-header { 
-        margin-bottom: 40px; 
-        position: relative; z-index: 10;
-    }
-
-    .split-layout { 
-        display: flex; align-items: flex-start; justify-content: space-between; 
-        flex: 1; position: relative;
-    }
-    
-    /* LEFT SIDE: Now holds stacked cards */
-    .content-left { 
-        width: 45%; 
-        position: relative; /* Context for absolute cards */
-        height: 400px;
-    }
-    
+    .split-layout { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 60px; }
+    .content-left { width: 45%; display: flex; flex-direction: column; gap: 200px; padding-bottom: 200px; }
     .content-right { width: 50%; }
 
-    /* Cards are now stacked on top of each other for the transition */
     .card {
-      position: absolute; top: 0; left: 0; width: 100%;
       background: #fff; padding: 32px; border-radius: 24px;
-      border: 1px solid #e2e8f0; 
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-      opacity: 0; 
-      transform: translateY(50px);
-      will-change: transform, opacity;
+      border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      opacity: 0; transform: translateY(30px);
     }
-    
     .card h3 { font-size: 1.5rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
     .card p { color: #64748b; font-size: 1.1rem; }
     .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
@@ -241,12 +224,11 @@
     footer { background: #000; color: #475569; text-align: center; padding: 40px; font-size: 0.9rem; position: relative; z-index: 60; }
 
     @media (max-width: 768px) {
-        .custom-scrollbar { display: none; }
+        .custom-scrollbar { display: none; } /* Hide on mobile */
         .split-layout { flex-direction: column; }
-        .content-left { width: 100%; height: auto; }
+        .content-left { width: 100%; gap: 40px; padding-bottom: 50px;}
         .content-right { display: none; }
-        .card { position: relative; opacity: 1; transform: none; margin-bottom: 20px;}
-        .content-section { height: auto; }
+        .hero-content { top: 10%; }
     }
   </style>
 </head>
@@ -271,9 +253,15 @@
       <div class="sb-wrap" onclick="document.getElementById('section-content').scrollIntoView()">
           <div class="sb-label">How it Works</div>
           <div class="sb-group">
-              <div class="sb-sub"><div class="sb-fill" id="fill-step1"></div></div>
-              <div class="sb-sub"><div class="sb-fill" id="fill-step2"></div></div>
-              <div class="sb-sub"><div class="sb-fill" id="fill-step3"></div></div>
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step1"></div>
+              </div>
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step2"></div>
+              </div>
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step3"></div>
+              </div>
           </div>
       </div>
 
@@ -283,7 +271,9 @@
               <div class="sb-fill" id="fill-join"></div>
           </div>
       </div>
+
   </div>
+
 
   <div class="phone-wrapper-fixed">
       <div class="phone-stage" id="global-phone">
@@ -302,6 +292,7 @@
       </div>
   </div>
 
+
   <section class="hero" id="hero-section">
       <div class="hero-content container" id="hero-text"> 
         <div class="heading-swapper">
@@ -316,31 +307,32 @@
     <div class="container">
       <div class="reveal-header">
         <h2 style="text-align:left; font-size: 2.5rem; margin-bottom: 20px; max-width: 500px;">How it works</h2>
-        <p style="text-align:left; max-width:500px;">No willpower required. Plug in your phone, click a button, and we handle the rest.</p>
+        <p style="text-align:left; max-width:500px; margin-bottom: 40px;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest.</p>
       </div>
       
       <div class="split-layout">
         <div class="content-left">
           
-          <div class="card" id="card-step1">
+          <div class="card step-card" id="card-step1">
             <span class="step-num">Step 01</span>
             <h3>Install on Mac</h3>
             <p>Download the SLATE companion app. It acts as the command center for your device.</p>
           </div>
           
-          <div class="card" id="card-step2">
+          <div class="card step-card" id="card-step2">
             <span class="step-num">Step 02</span>
             <h3>Supervise</h3>
             <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
           </div>
           
-          <div class="card" id="card-step3">
+          <div class="card step-card" id="card-step3">
             <span class="step-num">Step 03</span>
             <h3>Shift</h3>
             <p>Hit the switch. All distracting apps are hidden. Only essentials remain. Your phone is now a tool.</p>
           </div>
 
         </div>
+
         <div class="content-right"></div>
       </div>
     </div>
@@ -366,7 +358,7 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    // --- ELEMENTS ---
+    // --- ELEMENTS FOR SCROLLBAR ---
     const sbChaos = document.getElementById('fill-chaos');
     const sbFocus = document.getElementById('fill-focus');
     const sbStep1 = document.getElementById('fill-step1');
@@ -374,36 +366,32 @@
     const sbStep3 = document.getElementById('fill-step3');
     const sbJoin  = document.getElementById('fill-join');
 
-    // --- 0. DARK MODE TRIGGER ---
-    // Turns scrollbar black when entering the white section
-    ScrollTrigger.create({
-        trigger: "#section-content",
-        start: "top center",
-        end: "bottom center",
-        toggleClass: { targets: ".custom-scrollbar", className: "dark" }
-    });
-
     // --- 1. HERO PINNED ANIMATION ---
     const heroTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=2000",
+            end: "+=2000", // Pinned for 2000px
             pin: true,
             scrub: 1,
             onUpdate: (self) => {
+                // Progress is 0 to 1
                 const p = self.progress;
+                
+                // Segment 1 (Chaos): Fills from 0.0 to 0.5
                 if (p <= 0.5) {
                     sbChaos.style.transform = `scaleY(${p * 2})`;
                     sbFocus.style.transform = `scaleY(0)`;
                 } else {
                     sbChaos.style.transform = `scaleY(1)`;
+                    // Segment 2 (Focus): Fills from 0.5 to 1.0
                     sbFocus.style.transform = `scaleY(${(p - 0.5) * 2})`;
                 }
             }
         }
     });
 
+    // Animate Hero Text & Screen
     heroTl.to("#text-chaos", { opacity: 0, scale: 0.9, filter: "blur(10px)", duration: 1 }, 0)
           .to("#text-slate", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1 }, 0.5)
           .to(".hero", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0)
@@ -412,61 +400,62 @@
           .to("#phone-glow", { opacity: 0, duration: 1 }, 0);
 
 
-    // --- 2. HOW IT WORKS (PINNED SEQUENCE) ---
-    // This creates the "Pause/Hold" effect. The section Pins, and we scrub through cards.
-    const contentTl = gsap.timeline({
+    // --- 2. MOVE PHONE TO RIGHT ---
+    const moveTl = gsap.timeline({
         scrollTrigger: {
             trigger: "#section-content",
-            start: "top top", 
-            end: "+=3500", // LONG scroll distance to create the "Hold" feeling
-            pin: true,     // Pin the section
+            start: "top bottom",
+            end: "top top",
             scrub: 1,
         }
     });
 
-    // A. Move Phone Right (happens quickly at start)
-    contentTl.to("#global-phone", {
+    moveTl.to("#global-phone", {
         x: "25vw", 
         y: "10vh",
         scale: 0.85, 
         rotation: -2, 
-        ease: "power2.inOut",
-        duration: 1
+        ease: "power2.inOut"
     }, 0);
-    
-    // Hide Hero Text
-    contentTl.to("#hero-text", { opacity: 0, y: -50, duration: 0.5 }, 0);
-
-    // B. Card Sequence with Gaps (The "Holds")
-    // 0 -> 1: Phone moves
-    // 1 -> 2: Card 1 In
-    // 2 -> 3: Hold Card 1
-    // 3 -> 4: Card 1 Out, Card 2 In
-    // ...
-
-    // Card 1 In
-    contentTl.to("#card-step1", { opacity: 1, y: 0, duration: 1 }, 1);
-    contentTl.to(sbStep1, { scaleY: 1, duration: 0.5 }, 1); // Fill Bar
-    
-    // HOLD (Gap in timeline)
-    
-    // Card 1 Out / Card 2 In
-    contentTl.to("#card-step1", { opacity: 0, y: -30, duration: 1 }, 3); // Exit
-    contentTl.to("#card-step2", { opacity: 1, y: 0, duration: 1 }, 3.2); // Enter
-    contentTl.to(sbStep2, { scaleY: 1, duration: 0.5 }, 3.2); // Fill Bar
-
-    // HOLD
-
-    // Card 2 Out / Card 3 In
-    contentTl.to("#card-step2", { opacity: 0, y: -30, duration: 1 }, 5); // Exit
-    contentTl.to("#card-step3", { opacity: 1, y: 0, duration: 1 }, 5.2); // Enter
-    contentTl.to(sbStep3, { scaleY: 1, duration: 0.5 }, 5.2); // Fill Bar
-
-    // HOLD at end
-    contentTl.to({}, { duration: 1 }); 
+    moveTl.to("#hero-text", { opacity: 0, y: -50 }, 0);
 
 
-    // --- 3. CTA EXIT ---
+    // --- 3. CARD REVEALS & SUB-SEGMENT FILLING ---
+    const steps = [
+        { id: "#card-step1", bar: sbStep1 },
+        { id: "#card-step2", bar: sbStep2 },
+        { id: "#card-step3", bar: sbStep3 }
+    ];
+
+    steps.forEach((step) => {
+        // Animation for the card appearing
+        gsap.to(step.id, {
+            scrollTrigger: {
+                trigger: step.id,
+                start: "top 85%",
+                toggleActions: "play none none reverse"
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out"
+        });
+
+        // Animation for the scrollbar segment filling
+        gsap.to(step.bar, {
+            scrollTrigger: {
+                trigger: step.id,
+                start: "top 60%", // Fill when card is near middle of screen
+                end: "bottom 60%",
+                toggleActions: "play reverse play reverse"
+            },
+            scaleY: 1,
+            duration: 0.2
+        });
+    });
+
+
+    // --- 4. JOIN (CTA) SEGMENT ---
     gsap.to(sbJoin, {
         scrollTrigger: {
             trigger: "#section-cta",
@@ -477,6 +466,7 @@
         duration: 0.2
     });
 
+    // Phone Exit at CTA
     gsap.to("#global-phone", {
         scrollTrigger: {
             trigger: "#section-cta",
