@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
   <style>
     /* --- RESET & VARIABLES --- */
@@ -15,9 +18,6 @@
       --bg-dark: #020617;
       --text-white: #f8fafc;
       --text-muted: #94a3b8;
-      
-      /* Animation Variable */
-      --scroll-progress: 0; 
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
@@ -26,14 +26,13 @@
     ::-webkit-scrollbar { display: none; }
     
     html {
-        /* Enable Scroll Snap for that "Pause" feeling between sections */
-        scroll-snap-type: y mandatory;
-        scroll-behavior: smooth;
+        /* Removed scroll-snap for smoother GSAP control */
+        scroll-behavior: auto; /* Let GSAP handle smoothing */
     }
 
     body { 
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;  
+        scrollbar-width: none; 
         font-family: 'Inter', sans-serif;
         background-color: var(--bg-dark);
         color: var(--text-white);
@@ -41,7 +40,7 @@
         overflow-x: hidden;
     }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
 
     /* --- SEGMENTED SCROLLBAR --- */
     .custom-scrollbar {
@@ -67,76 +66,133 @@
         transition: background 0.3s ease;
     }
     
-    .scroll-segment:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
+    .scroll-segment:hover { background: rgba(255, 255, 255, 0.2); }
 
-    /* The white fill inside the segment */
     .segment-fill {
         position: absolute;
-        top: 0; /* ANCHOR TO TOP */
-        left: 0;
-        width: 100%;
-        height: 100%;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
         background: #fff;
-        transform: scaleY(0); /* Start Empty */
-        transform-origin: top center; /* Grow downwards */
+        transform: scaleY(0);
+        transform-origin: top center;
         transition: transform 0.1s linear; 
         will-change: transform;
     }
 
-    /* Tooltip/Label on Hover */
     .scroll-segment::before {
         content: attr(data-label);
         position: absolute;
-        right: 18px;
-        top: 50%;
+        right: 18px; top: 50%;
         transform: translateY(-50%);
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: #fff;
-        opacity: 0;
-        white-space: nowrap;
-        pointer-events: none;
+        font-size: 0.75rem; font-weight: 600;
+        color: #fff; opacity: 0;
+        white-space: nowrap; pointer-events: none;
         transition: opacity 0.2s;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        text-transform: uppercase; letter-spacing: 0.05em;
     }
 
-    .custom-scrollbar:hover .scroll-segment::before {
-        opacity: 0.5;
+    .custom-scrollbar:hover .scroll-segment::before { opacity: 0.5; }
+    .scroll-segment:hover::before { opacity: 1 !important; }
+
+    /* --- GLOBAL PHONE VISUAL (FIXED) --- */
+    /* This element sits on top of the site and moves via GSAP */
+    .phone-wrapper-fixed {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100vh;
+        z-index: 50; /* Above text initially, handled by layers */
+        pointer-events: none; /* Let clicks pass through */
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-    .scroll-segment:hover::before {
-        opacity: 1 !important;
+
+    .phone-stage {
+        position: relative;
+        width: auto;
+        height: 70vh; 
+        max-height: 800px;
+        aspect-ratio: 9 / 19.5; 
+        will-change: transform;
+    }
+
+    .phone-glow {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 140%; height: 100%;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+        filter: blur(50px);
+        opacity: 1; 
+    }
+
+    .phone-device {
+        width: 100%; height: 100%;
+        background: #000;
+        border-radius: 54px; 
+        box-shadow: 
+            0 0 0 1px #333,
+            0 0 0 3px #1a1a1a,
+            0 25px 70px -10px rgba(0,0,0,0.9);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dynamic-island {
+        position: absolute;
+        top: 11px; left: 50%;
+        transform: translateX(-50%);
+        width: 30%; height: 15px;
+        background: #000;
+        border-radius: 10px;
+        z-index: 60;
+    }
+
+    .screen {
+        position: absolute; inset: 6px; 
+        overflow: hidden;
+        border-radius: 48px;
+        background: #000;
+    }
+
+    .screen-img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .layer-chaos {
+        position: absolute; inset: 0;
+        z-index: 2; 
+    }
+
+    .layer-slate {
+        position: absolute; inset: 0;
+        opacity: 0; /* Handled by GSAP now */
+        z-index: 3;
     }
 
     /* --- HERO SECTION --- */
     .hero {
-      height: 600vh; 
+      height: 100vh; /* Changed from 600vh, we use pinning now */
       position: relative;
-      scroll-snap-align: start; /* Snap point */
-    }
-
-    .hero-sticky {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      width: 100%;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center; 
-      background: radial-gradient(circle at 50% 50%, #1e293b calc(100% - (var(--scroll-progress) * 80%)), #000000 100%);
+      justify-content: center;
+      /* Dynamic Background handled by GSAP */
+      background: radial-gradient(circle at 50% 50%, #1e293b, #000000); 
+      z-index: 10;
     }
 
-    /* --- TEXT CONTENT --- */
     .hero-content {
       text-align: center;
-      z-index: 10;
-      flex-shrink: 0;
+      z-index: 40; /* Above the phone initially */
       margin-bottom: 25px;
-      margin-top: 40px;
+      /* Position absolute to center it exactly behind phone or above */
+      position: absolute;
+      top: 15%;
+      width: 100%;
     }
 
     .heading-swapper {
@@ -154,21 +210,15 @@
       margin: 0;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      transition: opacity 0.1s linear;
     }
 
     .title-chaos {
         background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%);
-        opacity: calc(1 - (var(--scroll-progress) * 3));
-        transform: scale(calc(1 - (var(--scroll-progress) * 0.1)));
-        filter: blur(calc(var(--scroll-progress) * 10px));
     }
 
     .title-slate {
         background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
-        opacity: calc((var(--scroll-progress) * 3) - 1.2);
-        transform: scale(calc(0.9 + (var(--scroll-progress) * 0.1)));
-        filter: blur(calc((1 - var(--scroll-progress)) * 10px));
+        opacity: 0; /* GSAP will handle */
     }
 
     .hero-subtitle {
@@ -178,140 +228,61 @@
       color: #94a3b8;
     }
 
-    /* --- PHONE VISUAL --- */
-    .phone-stage {
-      position: relative;
-      z-index: 20;
-      width: auto;
-      height: 75vh; 
-      max-height: 850px;
-      aspect-ratio: 9 / 19.5; 
-      transform: scale(calc(1.02 - (var(--scroll-progress) * 0.02)));
-    }
-
-    .phone-glow {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 140%; height: 100%;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 60%);
-      filter: blur(50px);
-      opacity: calc(1 - var(--scroll-progress)); 
-    }
-
-    .phone-device {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      border-radius: 54px; 
-      box-shadow: 
-        0 0 0 1px #333,
-        0 0 0 3px #1a1a1a,
-        0 25px 70px -10px rgba(0,0,0,0.9);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .dynamic-island {
-      position: absolute;
-      top: 11px; left: 50%;
-      transform: translateX(-50%);
-      width: 30%; height: 15px;
-      background: #000;
-      border-radius: 10px;
-      z-index: 60;
-    }
-
-    .screen {
-      position: absolute;
-      inset: 6px; 
-      overflow: hidden;
-      border-radius: 48px;
-      background: #000;
-    }
-
-    /* --- LAYERS & IMAGES --- */
-    .screen-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: top center;
-      display: block;
-    }
-
-    .layer-chaos {
-      position: absolute;
-      inset: 0;
-      opacity: calc(1 - (var(--scroll-progress) * 2));
-      filter: blur(calc(var(--scroll-progress) * 20px));
-      transform: scale(calc(1 - (var(--scroll-progress) * 0.05)));
-      transform-origin: center center;
-      z-index: 2; 
-    }
-
-    .layer-slate {
-      position: absolute;
-      inset: 0;
-      opacity: var(--scroll-progress);
-      transform: scale(calc(1.1 - (var(--scroll-progress) * 0.1)));
-      filter: blur(calc((1 - var(--scroll-progress)) * 15px));
-      z-index: 1;
-    }
-
-    /* --- CONTENT SECTIONS --- */
+    /* --- CONTENT SECTION (HOW IT WORKS) --- */
     .content-section {
       position: relative;
       background: #f8fafc;
       color: #0f172a;
+      min-height: 150vh; /* Tall enough to scroll through */
       padding: 120px 0;
-      z-index: 30;
-      scroll-snap-align: start; /* Snap point */
+      z-index: 40;
+      overflow: hidden; /* Keep content contained */
     }
 
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 40px;
-      margin-top: 60px;
+    .split-layout {
+        display: flex;
+        align-items: flex-start; /* Top align */
+        justify-content: space-between;
+        margin-top: 60px;
     }
 
-    /* --- ANIMATION REVEAL CLASSES --- */
-    .reveal {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    /* Left side holds the cards */
+    .content-left {
+        width: 45%;
+        display: flex;
+        flex-direction: column;
+        gap: 200px; /* Big gaps to create scroll distance */
+        padding-bottom: 200px; /* Space at bottom */
     }
 
-    .reveal.active {
-      opacity: 1;
-      transform: translateY(0);
+    /* Right side is empty reserved for the Phone */
+    .content-right {
+        width: 50%;
     }
-
-    .card:nth-child(1) { transition-delay: 0.1s; }
-    .card:nth-child(2) { transition-delay: 0.2s; }
-    .card:nth-child(3) { transition-delay: 0.3s; }
 
     .card {
       background: #fff; padding: 32px; border-radius: 24px;
       border: 1px solid #e2e8f0;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s, opacity 0.8s, transform 0.8s;
+      /* Initial state for scroll reveal */
+      opacity: 0;
+      transform: translateY(30px);
     }
-    .card:hover { transform: translateY(-5px); }
-    .card h3 { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
-    .card p { color: #64748b; font-size: 1rem; }
+    
+    .card h3 { font-size: 1.5rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
+    .card p { color: #64748b; font-size: 1.1rem; }
     .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
 
-    /* --- CTA & WAITLIST FORM --- */
+    /* --- CTA SECTION --- */
     .cta { 
       background: #000; 
       color: #fff; 
       text-align: center; 
-      padding: 120px 0 160px; /* Extra padding at bottom */
-      scroll-snap-align: start; /* Snap point */
+      padding: 120px 0 160px; 
+      z-index: 60;
+      position: relative;
     }
 
-    /* DISABLED BUTTON STYLES */
     .btn-buy {
       display: inline-block; 
       margin-top: 30px;
@@ -329,8 +300,6 @@
     .btn-buy:hover { 
       background: #475569; 
       color: #94a3b8; 
-      transform: none; 
-      box-shadow: none; 
       cursor: not-allowed;
     }
 
@@ -343,11 +312,8 @@
     }
 
     .waitlist-group {
-      max-width: 400px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      max-width: 400px; margin: 0 auto;
+      display: flex; flex-direction: column; gap: 12px;
     }
 
     .waitlist-input {
@@ -356,126 +322,119 @@
       padding: 14px 20px;
       border-radius: 12px;
       color: #fff;
-      font-family: inherit;
-      font-size: 1rem;
-      outline: none;
+      font-family: inherit; font-size: 1rem; outline: none;
       transition: border-color 0.2s, background 0.2s;
     }
-    .waitlist-input:focus {
-      border-color: #38bdf8;
-      background: rgba(255,255,255,0.12);
-    }
+    .waitlist-input:focus { border-color: #38bdf8; background: rgba(255,255,255,0.12); }
     
     .btn-waitlist {
-      background: #334155;
-      color: #fff;
+      background: #334155; color: #fff;
       border: 1px solid rgba(255,255,255,0.1);
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 1rem;
+      padding: 14px; border-radius: 12px;
+      font-weight: 600; cursor: pointer;
+      font-family: inherit; font-size: 1rem;
       transition: all 0.2s;
     }
-    .btn-waitlist:hover {
-      background: #475569;
-      border-color: #94a3b8;
-    }
+    .btn-waitlist:hover { background: #475569; border-color: #94a3b8; }
 
-    #form-status {
-      margin-top: 15px;
-      font-size: 0.9rem;
-      height: 20px; 
-    }
+    #form-status { margin-top: 15px; font-size: 0.9rem; height: 20px; }
     .status-success { color: #4ade80; }
     .status-error { color: #f87171; }
 
-    footer { background: #000; color: #475569; text-align: center; padding: 40px; border-top: 1px solid #1e293b; font-size: 0.9rem; }
+    footer { background: #000; color: #475569; text-align: center; padding: 40px; border-top: 1px solid #1e293b; font-size: 0.9rem; position: relative; z-index: 60; }
+
+    /* --- MOBILE RESPONSIVENESS --- */
+    @media (max-width: 768px) {
+        .split-layout { flex-direction: column; }
+        .content-left { width: 100%; gap: 40px; padding-bottom: 50px;}
+        .content-right { display: none; }
+        .hero-content { top: 10%; }
+        /* On mobile, we might want to disable the complex side animation */
+    }
+
   </style>
 </head>
 <body>
 
   <div class="custom-scrollbar">
-    
-    <div class="scroll-segment" id="seg-chaos" data-label="Chaos" onclick="scrollToPercent(0)">
+    <div class="scroll-segment" id="seg-chaos" data-label="Chaos" onclick="scrollToID('hero-trigger')">
         <div class="segment-fill"></div>
     </div>
-
-    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToPercent(0.55)">
+    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToID('hero-trigger')">
         <div class="segment-fill"></div>
     </div>
-
-    <div class="scroll-segment" id="seg-how" data-label="How it Works" onclick="scrollToTarget('section-content')">
+    <div class="scroll-segment" id="seg-how" data-label="How it Works" onclick="scrollToID('section-content')">
         <div class="segment-fill"></div>
     </div>
-
-    <div class="scroll-segment" id="seg-join" data-label="Join" onclick="scrollToTarget('section-cta')">
+    <div class="scroll-segment" id="seg-join" data-label="Join" onclick="scrollToID('section-cta')">
         <div class="segment-fill"></div>
     </div>
-
   </div>
 
-  <section class="hero" id="section-hero">
-    <div class="hero-sticky">
-      
-      <div class="hero-content container"> 
-        <div class="heading-swapper">
-            <h1 class="hero-title title-chaos">tired of distractions?</h1>
-            <h1 class="hero-title title-slate">go DUMB with SLATE</h1>
-        </div>
-        <p class="hero-subtitle">
-          reclaim your time and focus instantly.
-        </p>
-      </div>
-
-      <div class="phone-stage">
-        <div class="phone-glow"></div>
+  <div class="phone-wrapper-fixed">
+      <div class="phone-stage" id="global-phone">
+        <div class="phone-glow" id="phone-glow"></div>
         <div class="phone-device">
           <div class="dynamic-island"></div>
           <div class="screen">
-            <div class="layer-chaos">
+            <div class="layer-chaos" id="screen-chaos">
               <img src="chaos.PNG" alt="Chaotic Home Screen" class="screen-img">
             </div>
-            <div class="layer-slate">
+            <div class="layer-slate" id="screen-slate">
               <img src="dumb.PNG" alt="Minimalist Home Screen" class="screen-img">
             </div>
           </div>
         </div>
       </div>
+  </div>
 
-    </div>
+  <div id="hero-trigger" style="height: 200vh; position: absolute; top:0; left:0; width:100%; pointer-events:none;"></div>
+  
+  <section class="hero" id="hero-visuals">
+      <div class="hero-content container" id="hero-text"> 
+        <div class="heading-swapper">
+            <h1 class="hero-title title-chaos" id="text-chaos">tired of distractions?</h1>
+            <h1 class="hero-title title-slate" id="text-slate">go DUMB with SLATE</h1>
+        </div>
+        <p class="hero-subtitle" id="text-sub">
+          reclaim your time and focus instantly.
+        </p>
+      </div>
   </section>
 
   <section class="content-section" id="section-content">
     <div class="container">
-      <div class="reveal">
-        <h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 20px;">How it works</h2>
-        <p style="text-align:center; max-width:600px; margin:0 auto;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest via MDM protocols.</p>
+      <div class="reveal-header">
+        <h2 style="text-align:left; font-size: 2.5rem; margin-bottom: 20px; max-width: 500px;">How it works</h2>
+        <p style="text-align:left; max-width:500px; margin-bottom: 40px;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest.</p>
       </div>
       
-      <div class="grid-3">
-        <div class="card reveal">
-          <span class="step-num">Step 01</span>
-          <h3>Install on Mac</h3>
-          <p>Download the SLATE companion app. It acts as the command center for your device.</p>
+      <div class="split-layout">
+        <div class="content-left">
+          <div class="card step-card">
+            <span class="step-num">Step 01</span>
+            <h3>Install on Mac</h3>
+            <p>Download the SLATE companion app. It acts as the command center for your device.</p>
+          </div>
+          <div class="card step-card">
+            <span class="step-num">Step 02</span>
+            <h3>Supervise</h3>
+            <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
+          </div>
+          <div class="card step-card">
+            <span class="step-num">Step 03</span>
+            <h3>Shift</h3>
+            <p>Hit the switch. All distracting apps are hidden. Only essentials remain. Your phone is now a tool.</p>
+          </div>
         </div>
-        <div class="card reveal">
-          <span class="step-num">Step 02</span>
-          <h3>Supervise</h3>
-          <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
-        </div>
-        <div class="card reveal">
-          <span class="step-num">Step 03</span>
-          <h3>Shift</h3>
-          <p>Hit the switch. All distracting apps are hidden. Only essentials remain. Your phone is now a tool.</p>
-        </div>
+
+        <div class="content-right"></div>
       </div>
     </div>
   </section>
 
   <section class="cta" id="section-cta">
-    <div class="container reveal">
+    <div class="container reveal-cta">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
       <p style="color:#94a3b8;">One-time purchase. Lifetime focus.</p>
       
@@ -499,113 +458,122 @@
   </footer>
 
   <script>
-    const heroSection = document.querySelector('.hero');
-    const contentSection = document.getElementById('section-content');
-    const ctaSection = document.getElementById('section-cta');
-    const root = document.documentElement;
+    gsap.registerPlugin(ScrollTrigger);
 
-    // Segment Elements
+    // --- 1. HERO ANIMATION (CHAOS -> FOCUS) ---
+    // We create a timeline that is scrubbed by scrolling through #hero-trigger
+    const heroTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: "#hero-trigger",
+            start: "top top",
+            end: "bottom bottom",
+            scrub: 1, // Smoothness
+        }
+    });
+
+    // Animate Text Crossfade
+    heroTl.to("#text-chaos", { opacity: 0, scale: 0.9, filter: "blur(10px)", duration: 1 }, 0)
+          .to("#text-slate", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1 }, 0.5)
+          .to("#hero-visuals", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0); // Darken BG
+
+    // Animate Phone Screen Crossfade
+    heroTl.to("#screen-chaos", { opacity: 0, filter: "blur(10px)", duration: 1 }, 0)
+          .to("#screen-slate", { opacity: 1, filter: "blur(0px)", duration: 1 }, 0.5)
+          .to("#phone-glow", { opacity: 0, duration: 1 }, 0); // Remove glow
+
+
+    // --- 2. TRANSITION ANIMATION (CENTER -> RIGHT) ---
+    // As we scroll out of Hero and into Content
+    const moveTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: "#section-content",
+            start: "top bottom", // When content section hits bottom of viewport
+            end: "top center",   // When content section hits center
+            scrub: 1.5,
+        }
+    });
+
+    // 1. Move Phone to Right
+    moveTl.to("#global-phone", {
+        x: "25vw", // Move to the right quarter of screen
+        y: "10vh", // Move down slightly
+        scale: 0.85, // Shrink slightly
+        rotation: -2, // Slight tilt for style
+        ease: "power2.inOut"
+    }, 0);
+
+    // 2. Fade out Hero Text so it doesn't overlap
+    moveTl.to("#hero-text", {
+        y: -100,
+        opacity: 0,
+        duration: 0.5
+    }, 0);
+
+
+    // --- 3. REVEAL CARDS (HOW IT WORKS) ---
+    // Stagger the cards in the left column
+    const cards = document.querySelectorAll('.step-card');
+    cards.forEach((card, i) => {
+        gsap.to(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none reverse"
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+    });
+
+    // --- 4. PHONE EXIT ---
+    // When we hit the CTA section, move the phone away
+    gsap.to("#global-phone", {
+        scrollTrigger: {
+            trigger: "#section-cta",
+            start: "top bottom",
+            scrub: 1
+        },
+        y: "-150vh", // Fly up and away
+        opacity: 0
+    });
+
+
+    // --- 5. SCROLLBAR LOGIC (Vanilla JS + GSAP Mix) ---
     const segChaos = document.querySelector('#seg-chaos .segment-fill');
     const segSlate = document.querySelector('#seg-slate .segment-fill');
     const segHow = document.querySelector('#seg-how .segment-fill');
     const segJoin = document.querySelector('#seg-join .segment-fill');
 
-    // SCROLL ANIMATION LOOP
-    function scrollLoop() {
-      const scrollTop = window.scrollY;
-      const heroHeight = heroSection.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      
-      // Calculate Global Progress of Hero
-      let heroRatio = scrollTop / (heroHeight - viewportHeight);
-      if (heroRatio < 0) heroRatio = 0;
-      if (heroRatio > 1) heroRatio = 1;
+    window.addEventListener('scroll', () => {
+        const docHeight = document.body.scrollHeight - window.innerHeight;
+        const scrollPos = window.scrollY;
+        const progress = scrollPos / docHeight;
 
-      // Update Visuals (Phone/Text) - using standard 0-1 range
-      let visualProgress = heroRatio / 0.75; // Accelerate visual change slightly
-      if (visualProgress > 1) visualProgress = 1;
-      root.style.setProperty('--scroll-progress', visualProgress);
+        // Simple mapping based on visual sections
+        // Chaos (0 - 0.15)
+        segChaos.style.transform = `scaleY(${Math.min(scrollPos / (window.innerHeight * 0.5), 1)})`;
+        
+        // Focus (0.15 - 0.3)
+        let focusProg = (scrollPos - (window.innerHeight * 0.5)) / (window.innerHeight * 0.5);
+        segSlate.style.transform = `scaleY(${Math.max(0, Math.min(focusProg, 1))})`;
 
+        // How (0.3 - 0.8)
+        const howSection = document.getElementById('section-content');
+        let howProg = (scrollPos - howSection.offsetTop + window.innerHeight) / howSection.offsetHeight;
+        segHow.style.transform = `scaleY(${Math.max(0, Math.min(howProg, 1))})`;
 
-      // --- SEGMENT LOGIC WITH PAUSES ---
-      // To create a pause, we add "dead zones" in the logic where the bar stays at 100% or 0%
-      // even if the user is scrolling.
+        // Join (End)
+        const ctaSection = document.getElementById('section-cta');
+        let joinProg = (scrollPos - ctaSection.offsetTop + window.innerHeight) / ctaSection.offsetHeight;
+        segJoin.style.transform = `scaleY(${Math.max(0, Math.min(joinProg, 1))})`;
+    });
 
-      // 1. CHAOS SEGMENT (Top to Bottom)
-      // Fills from 0% scroll to 35% scroll. Pauses from 35% to 50%.
-      let chaosFill = 0;
-      if (heroRatio <= 0.35) {
-          chaosFill = heroRatio / 0.35;
-      } else {
-          chaosFill = 1;
-      }
-      segChaos.style.transform = `scaleY(${chaosFill})`;
-
-
-      // 2. FOCUS SEGMENT (Top to Bottom)
-      // Starts filling at 50% scroll. Full by 85%. 
-      // The gap between 35% and 50% is the "Pause" where Chaos is full but Focus hasn't started.
-      let slateFill = 0;
-      if (heroRatio > 0.50) {
-          slateFill = (heroRatio - 0.50) / 0.35;
-      }
-      if (slateFill > 1) slateFill = 1;
-      segSlate.style.transform = `scaleY(${slateFill})`;
-
-
-      // 3. HOW IT WORKS
-      const contentRect = contentSection.getBoundingClientRect();
-      let howFill = 0;
-      
-      // Start filling when section enters viewport
-      if (contentRect.top < viewportHeight) {
-          const distanceScrolled = viewportHeight - contentRect.top;
-          const totalDistance = contentRect.height + (viewportHeight * 0.5); // Add buffer for pause
-          howFill = distanceScrolled / totalDistance;
-      }
-      if (howFill > 1) howFill = 1;
-      if (howFill < 0) howFill = 0;
-      segHow.style.transform = `scaleY(${howFill})`;
-
-
-      // 4. JOIN
-      const ctaRect = ctaSection.getBoundingClientRect();
-      let joinFill = 0;
-      if (ctaRect.top < viewportHeight) {
-          const distanceScrolled = viewportHeight - ctaRect.top;
-          // Shorter distance to fill to make it feel responsive at the end
-          joinFill = distanceScrolled / (ctaRect.height * 0.8);
-      }
-      // Force fill if at very bottom of page
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
-        joinFill = 1;
-      }
-      if (joinFill > 1) joinFill = 1;
-      if (joinFill < 0) joinFill = 0;
-      segJoin.style.transform = `scaleY(${joinFill})`;
-
-      requestAnimationFrame(scrollLoop);
-    }
-    requestAnimationFrame(scrollLoop);
-
-    // --- CLICK TO SCROLL HELPERS ---
-    function scrollToTarget(id) {
+    // Scroll Helper
+    function scrollToID(id) {
         document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
-
-    function scrollToPercent(pct) {
-        const heroHeight = heroSection.offsetHeight;
-        const targetY = (heroHeight - window.innerHeight) * pct;
-        window.scrollTo({ top: targetY, behavior: 'smooth' });
-    }
-
-    // --- SCROLL REVEAL OBSERVER ---
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('active');
-      });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // --- FORMSPREE HANDLING ---
     const form = document.getElementById("waitlist-form");
@@ -628,6 +596,7 @@
         status.className = "status-error";
       }
     });
+
   </script>
 
 </body>
