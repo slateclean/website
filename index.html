@@ -22,6 +22,13 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
 
+    /* HIDE DEFAULT SCROLLBAR */
+    ::-webkit-scrollbar { display: none; }
+    body { 
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-dark);
@@ -31,6 +38,75 @@
     }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* --- CUSTOM SCROLLBAR --- */
+    .custom-scrollbar {
+        position: fixed;
+        right: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 200px; /* Fixed height like the design reference */
+        width: 6px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 999px;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    }
+
+    .scroll-track {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .scroll-thumb {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 40px; /* Height of the moving pill */
+        background: #fff;
+        border-radius: 999px;
+        cursor: grab;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        transition: transform 0.1s linear; /* Smooth follow */
+    }
+
+    .scroll-marker {
+        position: absolute;
+        right: 12px; /* Push out to the left of the bar */
+        top: 0; /* Set by JS */
+        width: auto;
+        height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        pointer-events: auto;
+        cursor: pointer;
+        opacity: 0; /* Hidden by default, mapped by JS */
+        transform: translateY(-50%); /* Center on the point */
+        transition: opacity 0.3s;
+    }
+
+    /* The visual tick mark */
+    .scroll-marker::after {
+        content: '';
+        display: block;
+        width: 6px; 
+        height: 2px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        transition: width 0.2s, background-color 0.2s;
+    }
+
+    .custom-scrollbar:hover .scroll-marker {
+        opacity: 1;
+    }
+
+    .scroll-marker:hover::after {
+        width: 12px;
+        background-color: #fff;
+    }
 
     /* --- HERO SECTION --- */
     .hero {
@@ -334,7 +410,13 @@
 </head>
 <body>
 
-  <section class="hero">
+  <div class="custom-scrollbar" id="customScrollbar">
+    <div class="scroll-track" id="scrollTrack">
+        <div class="scroll-thumb" id="scrollThumb"></div>
+        </div>
+  </div>
+
+  <section class="hero" id="section-hero">
     <div class="hero-sticky">
       
       <div class="hero-content container"> 
@@ -370,7 +452,7 @@
     </div>
   </section>
 
-  <section class="content-section">
+  <section class="content-section" id="section-content">
     <div class="container">
       <div class="reveal">
         <h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 20px;">How it works</h2>
@@ -397,7 +479,7 @@
     </div>
   </section>
 
-  <section class="cta">
+  <section class="cta" id="section-cta">
     <div class="container reveal">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
       <p style="color:#94a3b8;">One-time purchase. Lifetime focus.</p>
@@ -426,7 +508,7 @@
     const heroSection = document.querySelector('.hero');
     const root = document.documentElement;
 
-    function updateScroll() {
+    function updateHeroAnimation() {
       const scrollTop = window.scrollY;
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
@@ -438,9 +520,82 @@
       if (visualProgress > 1) visualProgress = 1;
 
       root.style.setProperty('--scroll-progress', visualProgress);
-      requestAnimationFrame(updateScroll);
     }
-    requestAnimationFrame(updateScroll);
+
+    // --- CUSTOM SCROLLBAR LOGIC ---
+    const scrollTrack = document.getElementById('scrollTrack');
+    const scrollThumb = document.getElementById('scrollThumb');
+    
+    function updateCustomScrollbar() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight;
+        const winHeight = window.innerHeight;
+        
+        // Calculate scroll percentage
+        const scrollPercent = scrollTop / (docHeight - winHeight);
+        
+        // Calculate thumb position within the track
+        // We subtract thumb height (40px) to keep it inside the track
+        const trackHeight = scrollTrack.clientHeight;
+        const thumbHeight = scrollThumb.clientHeight;
+        const maxTop = trackHeight - thumbHeight;
+        
+        const thumbTop = scrollPercent * maxTop;
+        
+        scrollThumb.style.transform = `translateY(${thumbTop}px)`;
+    }
+
+    // --- MARKER GENERATION ---
+    // Automatically find sections and place markers
+    function createScrollMarkers() {
+        // Sections we want markers for
+        const sections = [
+            document.getElementById('section-hero'),
+            document.getElementById('section-content'),
+            document.getElementById('section-cta')
+        ];
+
+        const docHeight = document.documentElement.scrollHeight;
+        const trackHeight = scrollTrack.clientHeight;
+
+        sections.forEach(section => {
+            if(!section) return;
+
+            // Create marker element
+            const marker = document.createElement('div');
+            marker.className = 'scroll-marker';
+            
+            // Calculate relative position of section top
+            // Note: because the hero is huge (600vh), the markers will be spaced interestingly
+            const rect = section.getBoundingClientRect();
+            const absoluteTop = window.scrollY + rect.top;
+            
+            // Position on scrollbar (0 to 1)
+            const positionRatio = absoluteTop / docHeight;
+            
+            // Use percentage for top
+            marker.style.top = (positionRatio * 100) + '%';
+            
+            // Add Click Listener to scroll to section
+            marker.addEventListener('click', () => {
+                section.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            scrollTrack.appendChild(marker);
+        });
+    }
+
+    // Initialize Markers
+    window.addEventListener('load', createScrollMarkers);
+    
+    // Update loops
+    function loop() {
+        updateHeroAnimation();
+        updateCustomScrollbar();
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
 
     // --- SCROLL REVEAL OBSERVER ---
     const observerOptions = { threshold: 0.15 };
