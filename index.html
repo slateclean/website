@@ -255,21 +255,21 @@
   <div class="custom-scrollbar">
       
       <div class="sb-wrap" onclick="window.scrollTo(0,0)">
-          <div class="sb-label">o</div>
+          <div class="sb-label"> o</div>
           <div class="sb-segment">
               <div class="sb-fill" id="fill-chaos"></div>
           </div>
       </div>
 
       <div class="sb-wrap">
-          <div class="sb-label">o</div>
+          <div class="sb-label"> o</div>
           <div class="sb-segment">
               <div class="sb-fill" id="fill-focus"></div>
           </div>
       </div>
 
       <div class="sb-wrap" onclick="document.getElementById('section-content').scrollIntoView()">
-          <div class="sb-label">o</div>
+          <div class="sb-label"> o</div>
           <div class="sb-group">
               <div class="sb-sub">
                   <div class="sb-fill" id="fill-step1"></div>
@@ -284,7 +284,7 @@
       </div>
 
       <div class="sb-wrap" onclick="document.getElementById('section-cta').scrollIntoView()">
-          <div class="sb-label">o</div>
+          <div class="sb-label"> o</div>
           <div class="sb-segment">
               <div class="sb-fill" id="fill-join"></div>
           </div>
@@ -420,6 +420,7 @@
 
 
     // --- 2. MOVE PHONE TO RIGHT ---
+    // UPDATED: Changed y from "10vh" to "-5vh" to raise the phone position
     const moveTl = gsap.timeline({
         scrollTrigger: {
             trigger: "#section-content",
@@ -431,7 +432,7 @@
 
     moveTl.to("#global-phone", {
         x: "25vw", 
-        y: "10vh",
+        y: "-5vh", // <--- UPDATED THIS VALUE to move phone UP
         scale: 0.85, 
         rotation: -2, 
         ease: "power2.inOut"
