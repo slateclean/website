@@ -24,17 +24,21 @@
 
     /* HIDE DEFAULT SCROLLBAR */
     ::-webkit-scrollbar { display: none; }
+    
+    html {
+        /* Enable Scroll Snap for that "Pause" feeling between sections */
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+    }
+
     body { 
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-white);
-      line-height: 1.6;
-      overflow-x: hidden;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-white);
+        line-height: 1.6;
+        overflow-x: hidden;
     }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
@@ -50,11 +54,11 @@
         z-index: 1000;
         display: flex;
         flex-direction: column;
-        gap: 6px; /* The gap between segments */
+        gap: 6px; 
     }
 
     .scroll-segment {
-        flex: 1; /* Distribute height equally */
+        flex: 1; 
         background: rgba(255, 255, 255, 0.1);
         border-radius: 4px;
         position: relative;
@@ -70,13 +74,14 @@
     /* The white fill inside the segment */
     .segment-fill {
         position: absolute;
-        bottom: 0;
+        top: 0; /* ANCHOR TO TOP */
         left: 0;
         width: 100%;
         height: 100%;
         background: #fff;
-        transform: translateY(100%); /* Start hidden (pushed down) */
-        transition: transform 0.1s linear; /* Smooth fill */
+        transform: scaleY(0); /* Start Empty */
+        transform-origin: top center; /* Grow downwards */
+        transition: transform 0.1s linear; 
         will-change: transform;
     }
 
@@ -109,6 +114,7 @@
     .hero {
       height: 600vh; 
       position: relative;
+      scroll-snap-align: start; /* Snap point */
     }
 
     .hero-sticky {
@@ -259,6 +265,7 @@
       color: #0f172a;
       padding: 120px 0;
       z-index: 30;
+      scroll-snap-align: start; /* Snap point */
     }
 
     .grid-3 {
@@ -301,6 +308,7 @@
       color: #fff; 
       text-align: center; 
       padding: 120px 0 160px; /* Extra padding at bottom */
+      scroll-snap-align: start; /* Snap point */
     }
 
     /* DISABLED BUTTON STYLES */
@@ -394,7 +402,7 @@
         <div class="segment-fill"></div>
     </div>
 
-    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToPercent(0.35)">
+    <div class="scroll-segment" id="seg-slate" data-label="Focus" onclick="scrollToPercent(0.55)">
         <div class="segment-fill"></div>
     </div>
 
@@ -508,67 +516,73 @@
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
       
-      // --- 1. HERO ANIMATION MATH (Existing Logic) ---
-      // We use this to drive the phone changes
-      let rawProgress = scrollTop / (heroHeight - viewportHeight);
-      let visualProgress = rawProgress / 0.75;
-      if (visualProgress < 0) visualProgress = 0;
+      // Calculate Global Progress of Hero
+      let heroRatio = scrollTop / (heroHeight - viewportHeight);
+      if (heroRatio < 0) heroRatio = 0;
+      if (heroRatio > 1) heroRatio = 1;
+
+      // Update Visuals (Phone/Text) - using standard 0-1 range
+      let visualProgress = heroRatio / 0.75; // Accelerate visual change slightly
       if (visualProgress > 1) visualProgress = 1;
       root.style.setProperty('--scroll-progress', visualProgress);
 
-      // --- 2. SEGMENT FILL LOGIC ---
-      
-      // SEGMENT 1: CHAOS (First half of hero animation)
-      // Maps visualProgress 0.0 -> 0.5 to 0% -> 100% fill
-      let chaosFill = (visualProgress / 0.5) * 100;
-      if(chaosFill > 100) chaosFill = 100;
-      if(chaosFill < 0) chaosFill = 0;
-      // Invert translate: 100% means hidden, 0% means full. 
-      // So if fill is 100%, translate is 0%.
-      segChaos.style.transform = `translateY(${100 - chaosFill}%)`;
 
-      // SEGMENT 2: FOCUS (Second half of hero animation)
-      // Maps visualProgress 0.5 -> 1.0 to 0% -> 100% fill
+      // --- SEGMENT LOGIC WITH PAUSES ---
+      // To create a pause, we add "dead zones" in the logic where the bar stays at 100% or 0%
+      // even if the user is scrolling.
+
+      // 1. CHAOS SEGMENT (Top to Bottom)
+      // Fills from 0% scroll to 35% scroll. Pauses from 35% to 50%.
+      let chaosFill = 0;
+      if (heroRatio <= 0.35) {
+          chaosFill = heroRatio / 0.35;
+      } else {
+          chaosFill = 1;
+      }
+      segChaos.style.transform = `scaleY(${chaosFill})`;
+
+
+      // 2. FOCUS SEGMENT (Top to Bottom)
+      // Starts filling at 50% scroll. Full by 85%. 
+      // The gap between 35% and 50% is the "Pause" where Chaos is full but Focus hasn't started.
       let slateFill = 0;
-      if(visualProgress > 0.5) {
-        slateFill = ((visualProgress - 0.5) / 0.5) * 100;
+      if (heroRatio > 0.50) {
+          slateFill = (heroRatio - 0.50) / 0.35;
       }
-      if(slateFill > 100) slateFill = 100;
-      segSlate.style.transform = `translateY(${100 - slateFill}%)`;
+      if (slateFill > 1) slateFill = 1;
+      segSlate.style.transform = `scaleY(${slateFill})`;
 
-      // SEGMENT 3: HOW IT WORKS
-      // Standard scroll progress for this section
+
+      // 3. HOW IT WORKS
       const contentRect = contentSection.getBoundingClientRect();
-      const contentStart = contentRect.top - viewportHeight;
-      const contentEnd = contentRect.height;
+      let howFill = 0;
       
-      // Calculate % of section scrolled
-      let howProgress = 0;
+      // Start filling when section enters viewport
       if (contentRect.top < viewportHeight) {
-          // How far have we scrolled past the top entering view?
-          const scrolledPast = viewportHeight - contentRect.top;
-          // Normalize (making it fill up as you scroll through)
-          howProgress = (scrolledPast / (contentRect.height + viewportHeight/2)) * 100;
+          const distanceScrolled = viewportHeight - contentRect.top;
+          const totalDistance = contentRect.height + (viewportHeight * 0.5); // Add buffer for pause
+          howFill = distanceScrolled / totalDistance;
       }
-      if(howProgress > 100) howProgress = 100;
-      if(howProgress < 0) howProgress = 0;
-      segHow.style.transform = `translateY(${100 - howProgress}%)`;
+      if (howFill > 1) howFill = 1;
+      if (howFill < 0) howFill = 0;
+      segHow.style.transform = `scaleY(${howFill})`;
 
-      // SEGMENT 4: JOIN
+
+      // 4. JOIN
       const ctaRect = ctaSection.getBoundingClientRect();
-      let joinProgress = 0;
+      let joinFill = 0;
       if (ctaRect.top < viewportHeight) {
-          const scrolledPast = viewportHeight - ctaRect.top;
-          joinProgress = (scrolledPast / ctaRect.height) * 100;
+          const distanceScrolled = viewportHeight - ctaRect.top;
+          // Shorter distance to fill to make it feel responsive at the end
+          joinFill = distanceScrolled / (ctaRect.height * 0.8);
       }
-      // Since it's the last section, ensure it hits 100% at bottom
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-        joinProgress = 100;
+      // Force fill if at very bottom of page
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+        joinFill = 1;
       }
-      
-      if(joinProgress > 100) joinProgress = 100;
-      if(joinProgress < 0) joinProgress = 0;
-      segJoin.style.transform = `translateY(${100 - joinProgress}%)`;
+      if (joinFill > 1) joinFill = 1;
+      if (joinFill < 0) joinFill = 0;
+      segJoin.style.transform = `scaleY(${joinFill})`;
 
       requestAnimationFrame(scrollLoop);
     }
@@ -581,7 +595,7 @@
 
     function scrollToPercent(pct) {
         const heroHeight = heroSection.offsetHeight;
-        const targetY = heroHeight * pct;
+        const targetY = (heroHeight - window.innerHeight) * pct;
         window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
 
