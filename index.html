@@ -5,16 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SLATE | Return to Focus</title>
   <style>
-    /* --- 1. CORE VARIABLES & RESET --- */
     :root {
-      --bg-color: #020617;
       --text-color: #f9fafb;
       --muted-text: #9ca3af;
-      --accent-color: #0ea5e9;
-      --phone-bezel: #020617;
       --phone-border: rgba(148, 163, 184, 0.36);
-      --focus-progress: 0;  /* 0 = chaos, 1 = dumbphone */
-      --chaos-progress: 0;  /* 0 = calm, 1 = full chaos */
+      --focus-progress: 0;   /* 0 = chaos, 1 = dumbphone */
+      --chaos-progress: 0;   /* 0 = calm, 1 = full chaos */
     }
 
     * {
@@ -33,7 +29,7 @@
     }
 
     body.is-focused {
-      background: radial-gradient(circle at 50% -60%, #0f172a 0%, #020617 40%, #000 100%);
+      background: radial-gradient(circle at 50% -60%, #020617 0%, #020617 40%, #000 100%);
     }
 
     .container {
@@ -42,9 +38,7 @@
       padding: 0 20px;
     }
 
-    section {
-      padding: 80px 0;
-    }
+    section { padding: 80px 0; }
 
     h1, h2, h3 {
       letter-spacing: -0.03em;
@@ -56,28 +50,25 @@
       font-size: 1.05rem;
     }
 
-    /* --- 2. HERO SHELL (SCROLL-HOLD) --- */
+    /* HERO SCROLL-HOLD */
 
-    /* This section is taller than the viewport.
-       The inner content sticks to the top and
-       stays in view while we scroll through the animation. */
     .hero {
-      height: 260vh;              /* ~2.6 "screens" of scroll just for the hero */
+      height: 260vh;              /* long scroll region for animation */
       position: relative;
-      padding: 0;                 /* padding handled by inner */
+      padding: 0;
       overflow: visible;
     }
 
     .hero-inner {
       position: sticky;
       top: 0;
-      min-height: 100vh;          /* always fill the viewport */
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
       padding-top: 72px;
-      padding-bottom: 120px;      /* extra breathing room around phone */
+      padding-bottom: 120px;
       overflow: hidden;
     }
 
@@ -135,7 +126,8 @@
       margin-top: 52px;
     }
 
-    /* --- 3. PHONE + GLOW --- */
+    /* PHONE + GLOW */
+
     .hero-glow {
       position: absolute;
       top: 50%;
@@ -161,10 +153,10 @@
       transform: translate(-50%, -50%);
       padding: 14px;
       border-radius: 44px;
-      background: radial-gradient(circle at 0% 0%, #111827, #020617);
+      background: radial-gradient(circle at 0% 0%, #020617 0%, #020617 50%, #020617 100%);
       box-shadow:
         0 30px 90px rgba(0, 0, 0, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.7);
+        0 0 0 1px rgba(15, 23, 42, 0.9);
       border: 1px solid var(--phone-border);
       z-index: 3;
     }
@@ -183,12 +175,14 @@
       top: 16px;
       left: 50%;
       transform: translateX(-50%);
-      width: 114px;
-      height: 30px;
+      width: 120px;
+      height: 32px;
       background: #020617;
       border-radius: 999px;
       z-index: 10;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.9),
+        0 10px 20px rgba(0, 0, 0, 0.85);
     }
 
     .phone-screen {
@@ -202,17 +196,16 @@
     .screen-layer {
       position: absolute;
       inset: 0;
-      padding: 52px 18px 22px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       transition:
         opacity 0.45s ease,
         transform 0.45s ease,
         filter 0.45s ease;
     }
 
+    /* CHAOS LAYER */
+
     .screen-layer-chaos {
+      padding: 52px 18px 22px;
       background: linear-gradient(
         180deg,
         #4f46e5 0%,
@@ -225,14 +218,21 @@
       transform: translateY(calc(var(--focus-progress) * -12px));
     }
 
+    /* DUMBPHONE LAYER (MATCHES YOUR SCREENSHOT) */
+
     .screen-layer-slate {
+      padding: 52px 24px 24px;
       background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       opacity: var(--focus-progress);
-      filter: blur(calc((1 - var(--focus-progress)) * 4px));
-      transform: translateY(calc((1 - var(--focus-progress)) * 22px));
+      filter: blur(calc((1 - var(--focus-progress)) * 3px));
+      transform: translateY(calc((1 - var(--focus-progress)) * 18px));
     }
 
-    /* --- 4. STATUS BAR --- */
+    /* STATUS BAR */
+
     .screen-status {
       position: absolute;
       top: 18px;
@@ -257,7 +257,8 @@
       color: #f9fafb;
     }
 
-    /* --- 5. CHAOS SCREEN CONTENT --- */
+    /* CHAOS CONTENT */
+
     .screen-chaos-body {
       margin-top: 8px;
       position: relative;
@@ -274,7 +275,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Pop in with chaos-progress */
       opacity: calc(0.1 + 0.9 * var(--chaos-progress));
       transform: translateY(calc((1 - var(--chaos-progress)) * 24px));
       transition: opacity 0.25s ease-out, transform 0.25s ease-out;
@@ -316,58 +316,22 @@
       box-shadow: 0 14px 40px rgba(15, 23, 42, 0.8);
     }
 
-    .distracted-dock .app-item .app-name {
-      display: none;
-    }
+    .distracted-dock .app-item .app-name { display: none; }
 
-    /* --- 6. SLATE (DUMBPHONE) SCREEN CONTENT --- */
-    .slate-main {
+    /* DUMBPHONE ICON GRID (2x3) */
+
+    .slate-screen {
+      flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 100%;
+      padding-top: 40px; /* space below status bar */
     }
 
-    .slate-top {
-      margin-top: 16px;
-      padding: 0 6px;
-      text-align: left;
-    }
-
-    .slate-time {
-      font-size: 3rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: #f9fafb;
-    }
-
-    .slate-day {
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.22em;
-      color: #6b7280;
-    }
-
-    .slate-headline {
-      margin-top: 18px;
-      font-size: 1.15rem;
-      font-weight: 500;
-      color: #e5e7eb;
-    }
-
-    .slate-subcopy {
-      margin-top: 6px;
-      font-size: 0.95rem;
-      color: #6b7280;
-      max-width: 90%;
-    }
-
-    .slate-center-grid {
-      margin-top: 38px;
-      padding: 0 8px;
+    .slate-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 26px 12px;
+      gap: 32px 28px;
       justify-items: center;
     }
 
@@ -375,62 +339,61 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: white;
     }
 
     .slate-icon-box {
-      width: 56px;
-      height: 56px;
-      background: #111827;
-      border-radius: 18px;
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background: #26262a;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 8px;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(55, 65, 81, 0.7);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
     }
 
     .slate-icon-box svg {
-      width: 26px;
-      height: 26px;
-      fill: none;
-      stroke: #e5e7eb;
+      width: 30px;
+      height: 30px;
+      stroke: #f9fafb;
       stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .slate-label {
-      font-size: 11px;
-      font-weight: 400;
-      color: #d1d5db;
+      font-size: 12px;
+      color: #f9fafb;
     }
 
+    /* DOCK (BOTTOM) */
+
     .slate-dock-container {
-      margin-top: 32px;
-      padding: 0 8px 2px;
+      margin-top: 40px;
     }
 
     .slate-dock {
-      background: #020617;
-      border-radius: 36px;
-      padding: 16px 20px;
+      background: #18181b;
+      border-radius: 40px;
+      padding: 18px 26px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
-      border: 1px solid rgba(31, 41, 55, 0.9);
     }
 
     .slate-dock .slate-icon-box {
-      width: 50px;
-      height: 50px;
-      margin-bottom: 0;
-      background: #020617;
-      border-radius: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      background: #232326;
       box-shadow: none;
     }
 
-    /* --- 7. FLOATING DISTRACTION ICONS --- */
+    /* FLOATING DISTRACTION ICONS AROUND PHONE */
+
     .floating-icon {
       position: absolute;
       width: 60px;
@@ -473,7 +436,8 @@
       pointer-events: none;
     }
 
-    /* --- 8. SECONDARY SECTIONS --- */
+    /* SECTIONS BELOW HERO */
+
     .steps-section {
       background: #f9fafb;
       color: #0f172a;
@@ -481,13 +445,9 @@
       padding-bottom: 80px;
     }
 
-    .steps-section h2 {
-      color: #020617;
-    }
+    .steps-section h2 { color: #020617; }
 
-    .steps-section p {
-      color: #4b5563;
-    }
+    .steps-section p { color: #4b5563; }
 
     .step-container {
       display: flex;
@@ -507,7 +467,7 @@
       transition:
         transform 0.2s ease,
         box-shadow 0.2s ease,
-        border-color 0.2s ease;
+        border-color 0.2s.ease;
     }
 
     .step:hover {
@@ -525,9 +485,7 @@
       letter-spacing: 0.18em;
     }
 
-    .step h3 {
-      margin-bottom: 8px;
-    }
+    .step h3 { margin-bottom: 8px; }
 
     .cta-section {
       text-align: center;
@@ -582,40 +540,21 @@
       border-top: 1px solid #111827;
     }
 
-    /* --- 9. RESPONSIVE --- */
+    /* RESPONSIVE */
+
     @media (max-width: 768px) {
-      .hero {
-        height: 260vh;
-      }
-
-      .hero-inner {
-        padding-top: 56px;
-        padding-bottom: 96px;
-      }
-
-      .hero-visual {
-        height: 480px;
-      }
-
-      .phone-wrapper {
-        width: 280px;
-        height: 580px;
-      }
-
-      .floating-icon {
-        width: 52px;
-        height: 52px;
-      }
-
-      .step-container {
-        flex-direction: column;
-      }
+      .hero { height: 260vh; }
+      .hero-inner { padding-top: 56px; padding-bottom: 96px; }
+      .hero-visual { height: 480px; }
+      .phone-wrapper { width: 280px; height: 580px; }
+      .floating-icon { width: 52px; height: 52px; }
+      .step-container { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HERO (SCROLL-HOLD AREA) -->
+  <!-- HERO (SCROLL-HOLD) -->
   <section class="hero">
     <div class="hero-inner">
       <div class="container">
@@ -654,7 +593,7 @@
 
                   <div class="screen-chaos-body">
                     <div class="app-grid">
-                      <!-- same icons as before -->
+                      <!-- same icons you had before -->
                       <div class="app-item">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Phone_iOS.png" class="app-icon-img" alt="Phone">
                         <span class="app-name">Phone</span>
@@ -758,7 +697,7 @@
                   </div>
                 </div>
 
-                <!-- SLATE LAYER -->
+                <!-- DUMBPHONE LAYER -->
                 <div class="screen-layer screen-layer-slate">
                   <div class="screen-status screen-status--dark">
                     <span>22:34</span>
@@ -769,113 +708,99 @@
                     </svg>
                   </div>
 
-                  <div class="slate-main">
-                    <div class="slate-top">
-                      <div class="slate-time">Focus</div>
-                      <div class="slate-day">Mon • Dumbphone mode</div>
-                      <div class="slate-headline">
-                        Everything off, except what you actually need.
+                  <div class="slate-screen">
+                    <div class="slate-grid">
+                      <!-- top row -->
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="7"></circle>
+                            <path d="M12 8v4l2 2"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Clock</span>
                       </div>
-                      <div class="slate-subcopy">
-                        Messages. Calls. Notes. Maps. That’s it. SLATE hides the rest until you decide you’re done.
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M3 6l7-3 4 2 7-3v16l-7 3-4-2-7 3z"></path>
+                            <path d="M10 5v14"></path>
+                            <path d="M14 6v14"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Maps</span>
+                      </div>
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <rect x="5" y="4" width="14" height="16" rx="2"></rect>
+                            <path d="M8 9h8M8 13h8M8 17h4"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Notes</span>
+                      </div>
+                      <!-- bottom row -->
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M5 4h3l2 4-2 2a11 11 0 0 0 6 6l2-2 4 2v3a3 3 0 0 1-3 3A13 13 0 0 1 4 7a3 3 0 0 1 3-3z"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Phone</span>
+                      </div>
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M4 5h16v10H7l-3 3z"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Messages</span>
+                      </div>
+                      <div class="slate-app">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 1 .33 1.82l-.1.2a2 2 0 0 1-2 1.1 7.25 7.25 0 0 0-1.7-.4l-.4 1.1a2 2 0 0 1-1.9 1.3h-1a2 2 0 0 1-1.9-1.3l-.4-1.1a7.25 7.25 0 0 0-1.7.4 2 2 0 0 1-2-1.1l-.1-.2A1.65 1.65 0 0 1 4.6 15L5 14a6.5 6.5 0 0 1 0-4l-.4-1A1.65 1.65 0 0 1 4.9 7l.1-.2a2 2 0 0 1 2-1.1 7.25 7.25 0 0 0 1.7.4l.4-1.1A2 2 0 0 1 11 4h1a2 2 0 0 1 1.9 1.3l.4 1.1a7.25 7.25 0 0 0 1.7-.4 2 2 0 0 1 2 1.1l.1.2a1.65 1.65 0 0 1-.33 1.82L19 10a6.5 6.5 0 0 1 0 4z"></path>
+                          </svg>
+                        </div>
+                        <span class="slate-label">Settings</span>
                       </div>
                     </div>
 
-                    <div>
-                      <div class="slate-center-grid">
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <path d="M12 6v6l4 2"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Clock</span>
+                    <div class="slate-dock-container">
+                      <div class="slate-dock">
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M5 4h3l2 4-2 2a11 11 0 0 0 6 6l2-2 4 2v3a3 3 0 0 1-3 3A13 13 0 0 1 4 7a3 3 0 0 1 3-3z"></path>
+                          </svg>
                         </div>
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M3 3h18v18H3z"></path>
-                              <path d="M7 8h10M7 12h10M7 16h6"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Notes</span>
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M4 5h16v10H7l-3 3z"></path>
+                          </svg>
                         </div>
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M2 10l10-7 10 7-10 7z"></path>
-                              <path d="M4 12v7l8 5 8-5v-7"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Home</span>
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <rect x="4" y="7" width="16" height="12" rx="2"></rect>
+                            <circle cx="12" cy="13" r="3"></circle>
+                            <path d="M9 7l1-2h4l1 2"></path>
+                          </svg>
                         </div>
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3.1 8.18 2 2 0 0 1 5.11 6h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81A2 2 0 0 1 10.4 12L9 13.41a16 16 0 0 0 6 6L16.41 18a2 2 0 0 1 2.47-.33 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Phone</span>
-                        </div>
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M21 11.5a8.5 8.5 0 1 1-8.5-8.5"></path>
-                              <path d="M22 22l-4-4"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Search</span>
-                        </div>
-                        <div class="slate-app">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M3 5h18v14H3z"></path>
-                              <path d="M3 10h18"></path>
-                            </svg>
-                          </div>
-                          <span class="slate-label">Settings</span>
-                        </div>
-                      </div>
-
-                      <div class="slate-dock-container">
-                        <div class="slate-dock">
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M3 5h18v14H3z"></path>
-                              <path d="M3 10h18"></path>
-                            </svg>
-                          </div>
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"></path>
-                              <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                          </div>
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                              <path d="M16 2v4"></path>
-                              <path d="M8 2v4"></path>
-                            </svg>
-                          </div>
-                          <div class="slate-icon-box">
-                            <svg viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="4"></circle>
-                              <path d="M4 12h2M18 12h2M12 4v2M12 18v2"></path>
-                            </svg>
-                          </div>
+                        <div class="slate-icon-box">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M9 18V5l7-2v13"></path>
+                            <path d="M5 20l4-2"></path>
+                          </svg>
                         </div>
                       </div>
                     </div>
                   </div>
-
                 </div><!-- /screen-layer-slate -->
               </div><!-- /phone-screen -->
             </div><!-- /phone-frame -->
           </div><!-- /phone-wrapper -->
 
-          <!-- FLOATING DISTRACTION ICONS -->
+          <!-- FLOATING ICONS -->
           <div class="floating-icon icon-1">
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
           </div>
@@ -883,7 +808,7 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube">
           </div>
           <div class="floating-icon icon-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter/X">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter">
           </div>
           <div class="floating-icon icon-4">
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt="Reddit">
@@ -940,9 +865,7 @@
   </footer>
 
   <script>
-    // Scroll-hold logic:
-    // hero is tall; hero-inner is sticky.
-    // We map scroll inside hero to chaos + focus progress.
+    // Scroll-hold mapping scroll → chaos/focus progress
     (function () {
       const root = document.documentElement;
       const hero = document.querySelector('.hero');
@@ -955,8 +878,6 @@
         const heroTop = hero.offsetTop;
         const heroHeight = hero.offsetHeight;
         const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
-
-        // While hero-inner is sticky, scrollable span is heroHeight - viewport.
         const span = Math.max(heroHeight - viewport, viewport * 0.5);
 
         start = heroTop;
@@ -969,7 +890,7 @@
         if (progress < 0) progress = 0;
         if (progress > 1) progress = 1;
 
-        // Phase 1: build chaos (0 → 0.45)
+        // 0 → 0.45: fill with chaos
         let chaosProgress = 0;
         if (progress <= 0.45) {
           chaosProgress = progress / 0.45;
@@ -977,10 +898,10 @@
           chaosProgress = 1;
         }
 
-        // Phase 2: transition to focus (0.45 → 0.9)
+        // 0.45 → 0.9: transition to dumbphone
         let focusProgress = 0;
         if (progress > 0.45 && progress < 0.9) {
-          focusProgress = (progress - 0.45) / (0.45);
+          focusProgress = (progress - 0.45) / 0.45;
         } else if (progress >= 0.9) {
           focusProgress = 1;
         }
