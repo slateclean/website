@@ -36,8 +36,8 @@
 
     /* --- HERO SECTION --- */
     .hero {
-      /* INCREASED HEIGHT for longer hold time */
-      height: 450vh; 
+      /* INCREASED HEIGHT: Creates a longer "hold" feel */
+      height: 550vh; 
       position: relative;
     }
 
@@ -48,7 +48,6 @@
       width: 100%;
       overflow: hidden;
       
-      /* LAYOUT: Stack vertically */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -61,16 +60,16 @@
       );
     }
 
-    /* --- TEXT CONTENT & HEADING TRANSITION --- */
+    /* --- TEXT CONTENT --- */
     .hero-content {
       text-align: center;
       z-index: 10;
       flex-shrink: 0;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
       margin-top: 40px;
-      /* General fade in of the whole block */
-      opacity: var(--scroll-progress); 
-      transform: translateY(calc((1 - var(--scroll-progress)) * -20px));
+      
+      /* FIX: Removed opacity dependency so it's visible at start */
+      position: relative;
     }
 
     .pill {
@@ -83,51 +82,51 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: #cbd5e1;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       backdrop-filter: blur(10px);
     }
 
-    /* Container to stack the two headings */
+    /* Stack headings on top of each other */
     .heading-swapper {
         display: grid;
         place-items: center;
-        margin-bottom: 8px;
-        height: 60px; /* Fixed height to prevent layout shifts */
+        height: 60px;
+        position: relative;
     }
 
     .hero-title {
-      grid-area: 1 / 1; /* Stack them on top of each other */
-      font-size: clamp(2rem, 4vw, 3rem); 
+      grid-area: 1 / 1;
+      font-size: clamp(2rem, 4vw, 3.5rem); 
       line-height: 1.1;
       font-weight: 700;
-      margin-bottom: 0;
-      transition: opacity 0.1s linear, transform 0.1s linear, filter 0.1s linear;
+      margin: 0;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      transition: opacity 0.1s linear;
     }
 
-    /* Heading 1: Chaos State */
+    /* HEADING 1: CHAOS (Visible at start) */
     .title-chaos {
         background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%);
-        /* Fades out quickly as scroll starts */
-        opacity: calc(1 - (var(--scroll-progress) * 1.5));
-        transform: scale(calc(1 - (var(--scroll-progress) * 0.2)));
-        filter: blur(calc(var(--scroll-progress) * 8px));
+        /* Logic: Starts at 1, fades out by 40% scroll */
+        opacity: calc(1 - (var(--scroll-progress) * 2.5));
+        transform: scale(calc(1 - (var(--scroll-progress) * 0.1)));
+        filter: blur(calc(var(--scroll-progress) * 10px));
     }
 
-    /* Heading 2: Slate State */
+    /* HEADING 2: SLATE (Visible later) */
     .title-slate {
         background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
-        /* Fades in later */
-        opacity: calc((var(--scroll-progress) * 1.5) - 0.5);
-        transform: scale(calc(0.8 + (var(--scroll-progress) * 0.2)));
-        filter: blur(calc((1 - var(--scroll-progress)) * 8px));
+        /* Logic: Starts at 0, fades in after 40% scroll */
+        opacity: calc((var(--scroll-progress) * 2.5) - 1);
+        transform: scale(calc(0.9 + (var(--scroll-progress) * 0.1)));
+        filter: blur(calc((1 - var(--scroll-progress)) * 10px));
     }
 
     .hero-subtitle {
-      max-width: 450px;
-      margin: 0 auto;
-      font-size: 1rem;
+      max-width: 480px;
+      margin: 12px auto 0;
+      font-size: 1.05rem;
       color: #94a3b8;
     }
 
@@ -136,9 +135,10 @@
       position: relative;
       z-index: 20;
       width: auto;
-      height: 80vh; 
-      max-height: 800px;
+      height: 75vh; 
+      max-height: 780px;
       aspect-ratio: 9 / 19; 
+      /* Subtle zoom out effect */
       transform: scale(calc(1.05 - (var(--scroll-progress) * 0.05)));
     }
 
@@ -149,6 +149,7 @@
       width: 150%; height: 100%;
       background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 60%);
       filter: blur(60px);
+      /* Glow fades out */
       opacity: calc(1 - var(--scroll-progress)); 
     }
 
@@ -156,10 +157,10 @@
       width: 100%;
       height: 100%;
       background: #000;
-      border-radius: 44px;
+      border-radius: 46px;
       box-shadow: 
         0 0 0 1px #334155,
-        0 20px 50px -10px rgba(0,0,0,0.8);
+        0 20px 60px -10px rgba(0,0,0,0.9);
       position: relative;
       overflow: hidden;
     }
@@ -178,29 +179,30 @@
       position: absolute;
       inset: 0;
       overflow: hidden;
-      border-radius: 40px;
+      border-radius: 42px;
       background: #000;
     }
 
     .status-bar {
       position: absolute;
-      top: 18px; left: 24px; right: 24px;
+      top: 20px; left: 26px; right: 26px;
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       z-index: 40;
       color: #fff;
     }
 
-    /* LAYER 1: CHAOS (Starts Visible, Fades Out) */
+    /* LAYER 1: CHAOS */
     .layer-chaos {
       position: absolute;
       inset: 0;
-      padding: 55px 18px 20px;
+      padding: 60px 18px 20px;
       background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
       
-      opacity: calc(1 - (var(--scroll-progress) * 1.5));
+      /* Fades out */
+      opacity: calc(1 - (var(--scroll-progress) * 1.8));
       filter: blur(calc(var(--scroll-progress) * 15px));
       transform: scale(calc(1 - (var(--scroll-progress) * 0.05)));
       transform-origin: center center;
@@ -209,8 +211,8 @@
     .app-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px 10px;
-      margin-top: 10px;
+      gap: 16px 12px;
+      margin-top: 15px;
     }
 
     .app-item { display: flex; flex-direction: column; align-items: center; }
@@ -227,93 +229,105 @@
     .app-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .app-label {
-      font-size: 10px;
+      font-size: 11px;
       text-align: center;
       color: #fff;
       width: 100%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-weight: 500;
     }
 
     .dock-glass {
       position: absolute;
-      bottom: 18px; left: 14px; right: 14px;
-      height: 85px;
+      bottom: 22px; left: 16px; right: 16px;
+      height: 90px;
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(20px);
-      border-radius: 35px;
+      border-radius: 38px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      padding: 12px;
+      gap: 12px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.1);
       align-items: center;
     }
 
-    /* LAYER 2: SLATE (New Dumbphone Style) */
+    /* LAYER 2: SLATE (Fixed Alignment) */
     .layer-slate {
       position: absolute;
       inset: 0;
-      /* Adjusted padding for the new layout */
-      padding: 60px 24px 30px; 
+      padding: 70px 24px 34px;
       background: #000;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-
+      align-items: center; /* Centers content horizontally */
+      
+      /* Transition Logic */
       opacity: var(--scroll-progress);
-      transform: scale(calc(1.1 - (var(--scroll-progress) * 0.1)));
-      filter: blur(calc((1 - var(--scroll-progress)) * 10px));
+      transform: scale(calc(1.08 - (var(--scroll-progress) * 0.08)));
+      filter: blur(calc((1 - var(--scroll-progress)) * 12px));
     }
 
     .slate-time {
-      font-size: 3.5rem;
+      font-size: 4rem;
       font-weight: 300;
       text-align: center;
       color: var(--slate-icon-color);
       margin-top: 20px;
-      letter-spacing: -1px;
+      letter-spacing: -1.5px;
+      width: 100%;
     }
 
-    /* NEW SLATE GRID (Reference Image 1) */
+    /* GRID FIX: Constrained width to ensure proper spacing */
     .slate-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 30px 20px;
-      padding: 10px;
-      margin-top: auto; margin-bottom: auto;
+      gap: 30px 24px;
+      width: 100%;
+      max-width: 280px; /* Forces tighter icon grouping like iOS */
+      margin: auto 0; /* Vertically centers the grid */
     }
 
-    .slate-app-item { display: flex; flex-direction: column; align-items: center; }
+    .slate-app-item { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+    }
     
     .slate-icon-box {
-      width: 68px; height: 68px;
+      width: 64px; height: 64px;
       background: var(--slate-icon-bg);
-      border-radius: 24px;
+      border-radius: 20px; /* Slightly squarer for iOS feel */
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .slate-icon-box svg { width: 32px; height: 32px; stroke: var(--slate-icon-color); stroke-width: 1.5; }
-    .slate-label { color: var(--slate-icon-color); font-size: 13px; font-weight: 500; }
+    .slate-icon-box svg { width: 30px; height: 30px; stroke: var(--slate-icon-color); stroke-width: 2; }
+    .slate-label { color: var(--slate-icon-color); font-size: 12px; font-weight: 500; }
 
-    /* NEW SLATE DOCK (Reference Image 1) */
+    /* DOCK FIX */
     .slate-dock-container {
+        width: 100%;
+        max-width: 320px;
         background: #1c1c1e;
         border-radius: 38px;
         padding: 18px;
-        margin: 0 4px 10px;
+        margin-top: 20px;
     }
     .slate-dock { 
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 15px; 
     }
     .slate-dock-item {
-      width: 100%; aspect-ratio: 1/1;
-      border-radius: 22px;
+      width: 100%; 
+      aspect-ratio: 1/1;
+      border-radius: 20px;
       background: var(--slate-icon-bg);
       display: flex; align-items: center; justify-content: center;
     }
-    .slate-dock-item svg { width: 28px; height: 28px; stroke: var(--slate-icon-color); stroke-width: 1.5; fill: none;}
+    .slate-dock-item svg { width: 26px; height: 26px; stroke: var(--slate-icon-color); stroke-width: 2; fill: none;}
 
 
     /* --- CONTENT SECTIONS --- */
@@ -321,7 +335,7 @@
       position: relative;
       background: #f8fafc;
       color: #0f172a;
-      padding: 100px 0;
+      padding: 120px 0;
       z-index: 30;
     }
 
@@ -343,7 +357,7 @@
     .card p { color: #64748b; font-size: 1rem; }
     .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
 
-    .cta { background: #000; color: #fff; text-align: center; padding: 120px 0; }
+    .cta { background: #000; color: #fff; text-align: center; padding: 140px 0; }
     .btn-main {
       display: inline-block; margin-top: 30px;
       background: #fff; color: #000;
@@ -359,9 +373,9 @@
     @media (max-width: 768px) {
       .hero-title { font-size: 2.2rem; }
       .phone-stage { height: 65vh; }
-      .slate-icon-box { width: 58px; height: 58px; }
-      .slate-icon-box svg { width: 28px; height: 28px; }
-      .slate-grid { gap: 20px 15px; }
+      .slate-grid { gap: 20px 15px; max-width: 240px; }
+      .slate-icon-box { width: 56px; height: 56px; }
+      .slate-icon-box svg { width: 26px; height: 26px; }
     }
   </style>
 </head>
@@ -513,7 +527,6 @@
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
       
-      // Calculate progress based on the taller hero section
       let progress = scrollTop / (heroHeight - viewportHeight);
       
       if (progress < 0) progress = 0;
