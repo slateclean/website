@@ -120,6 +120,13 @@
         align-items: center;
         justify-content: center;
         padding-top: 5vh; 
+        
+        /* GLITCH FIX: Force GPU rendering layer to prevent painting snaps */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        perspective: 1000px;
     }
 
     .phone-stage {
@@ -127,7 +134,10 @@
         width: auto; height: 70vh; 
         max-height: 800px;
         aspect-ratio: 9 / 19.5; 
+        
+        /* GLITCH FIX: Ensure smooth transform processing */
         will-change: transform;
+        transform-style: preserve-3d;
     }
 
     .phone-glow {
@@ -208,7 +218,6 @@
     /* CTA */
     .cta { background: #000; color: #fff; text-align: center; padding: 120px 0 160px; z-index: 60; position: relative; }
     
-    /* --- UPDATED BUTTON STYLE (DISABLED LOOK) --- */
     .btn-buy {
       display: inline-block; margin-top: 30px; margin-bottom: 50px;
       background: #fff; color: #000; padding: 18px 40px; 
@@ -216,10 +225,9 @@
       transition: all 0.2s;
     }
 
-    /* Hover State: Gray, Unclickable */
     .btn-buy:hover { 
-      background: #475569; /* Slate Gray */
-      color: #94a3b8;      /* Muted Text */
+      background: #475569; 
+      color: #94a3b8;      
       cursor: not-allowed;
       box-shadow: none;
       transform: none;
@@ -242,7 +250,7 @@
     footer { background: #000; color: #475569; text-align: center; padding: 40px; font-size: 0.9rem; position: relative; z-index: 60; }
 
     @media (max-width: 768px) {
-        .custom-scrollbar { display: none; } /* Hide on mobile */
+        .custom-scrollbar { display: none; }
         .split-layout { flex-direction: column; }
         .content-left { width: 100%; gap: 40px; padding-bottom: 50px;}
         .content-right { display: none; }
@@ -253,45 +261,27 @@
 <body>
 
   <div class="custom-scrollbar">
-      
       <div class="sb-wrap" onclick="window.scrollTo(0,0)">
-          <div class="sb-label"> o</div>
-          <div class="sb-segment">
-              <div class="sb-fill" id="fill-chaos"></div>
-          </div>
+          <div class="sb-label">o</div>
+          <div class="sb-segment"><div class="sb-fill" id="fill-chaos"></div></div>
       </div>
-
       <div class="sb-wrap">
-          <div class="sb-label"> o</div>
-          <div class="sb-segment">
-              <div class="sb-fill" id="fill-focus"></div>
-          </div>
+          <div class="sb-label">o</div>
+          <div class="sb-segment"><div class="sb-fill" id="fill-focus"></div></div>
       </div>
-
       <div class="sb-wrap" onclick="document.getElementById('section-content').scrollIntoView()">
-          <div class="sb-label"> o</div>
+          <div class="sb-label">o</div>
           <div class="sb-group">
-              <div class="sb-sub">
-                  <div class="sb-fill" id="fill-step1"></div>
-              </div>
-              <div class="sb-sub">
-                  <div class="sb-fill" id="fill-step2"></div>
-              </div>
-              <div class="sb-sub">
-                  <div class="sb-fill" id="fill-step3"></div>
-              </div>
+              <div class="sb-sub"><div class="sb-fill" id="fill-step1"></div></div>
+              <div class="sb-sub"><div class="sb-fill" id="fill-step2"></div></div>
+              <div class="sb-sub"><div class="sb-fill" id="fill-step3"></div></div>
           </div>
       </div>
-
       <div class="sb-wrap" onclick="document.getElementById('section-cta').scrollIntoView()">
-          <div class="sb-label"> o</div>
-          <div class="sb-segment">
-              <div class="sb-fill" id="fill-join"></div>
-          </div>
+          <div class="sb-label">o</div>
+          <div class="sb-segment"><div class="sb-fill" id="fill-join"></div></div>
       </div>
-
   </div>
-
 
   <div class="phone-wrapper-fixed">
       <div class="phone-stage" id="global-phone">
@@ -309,7 +299,6 @@
         </div>
       </div>
   </div>
-
 
   <section class="hero" id="hero-section">
       <div class="hero-content container" id="hero-text"> 
@@ -330,27 +319,22 @@
       
       <div class="split-layout">
         <div class="content-left">
-          
           <div class="card step-card" id="card-step1">
             <span class="step-num">Step 01</span>
             <h3>Install on Mac</h3>
             <p>Download the SLATE companion app. It acts as the command center for your device.</p>
           </div>
-          
           <div class="card step-card" id="card-step2">
             <span class="step-num">Step 02</span>
             <h3>Supervise</h3>
             <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
           </div>
-          
           <div class="card step-card" id="card-step3">
             <span class="step-num">Step 03</span>
             <h3>Shift</h3>
             <p>Hit the switch. All distracting apps are hidden. Only essentials remain. Your phone is now a tool.</p>
           </div>
-
         </div>
-
         <div class="content-right"></div>
       </div>
     </div>
@@ -359,19 +343,14 @@
   <section class="cta" id="section-cta">
     <div class="container reveal-cta">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
-      
       <a href="#" class="btn-buy" onclick="return false;">Get SLATE for $99</a>
-      
       <div class="divider" style="margin: 30px 0; color:#555; font-size:0.8rem; text-transform:uppercase;">or join waitlist</div>
-      
       <form id="waitlist-form" action="https://formspree.io/f/mrbnaykd" method="POST" class="waitlist-group">
         <input type="text" name="name" class="waitlist-input" placeholder="Your Name" required>
         <input type="email" name="email" class="waitlist-input" placeholder="email@address.com" required>
         <button type="submit" class="btn-waitlist">Join Waitlist Now</button>
       </form>
-      
       <p id="form-status"></p>
-
     </div>
   </section>
 
@@ -395,7 +374,7 @@
         scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=2000", // Pinned for 2000px
+            end: "+=2000",
             pin: true,
             scrub: 1,
             onUpdate: (self) => {
@@ -419,25 +398,28 @@
           .to("#phone-glow", { opacity: 0, duration: 1 }, 0);
 
 
-    // --- 2. MOVE PHONE TO RIGHT ---
-    // UPDATED: Changed y from "10vh" to "-5vh" to raise the phone position
+    // --- 2. MOVE PHONE TO RIGHT (GLITCH FIX) ---
     const moveTl = gsap.timeline({
         scrollTrigger: {
             trigger: "#section-content",
             start: "top bottom",
             end: "top top",
-            scrub: 1,
+            scrub: 1, // Smoothing enabled
         }
     });
 
+    // FIX 1: immediateRender: false prevents GSAP from calculating the start position too early (before layout settles).
+    // FIX 2: Changed y to 0 (center) to raise it up from the low "10vh" position.
     moveTl.to("#global-phone", {
         x: "25vw", 
-        y: "-5vh", // <--- UPDATED THIS VALUE to move phone UP
+        y: "0vh",     
         scale: 0.85, 
         rotation: -2, 
-        ease: "power2.inOut"
+        ease: "power2.inOut",
+        immediateRender: false 
     }, 0);
-    moveTl.to("#hero-text", { opacity: 0, y: -50 }, 0);
+    
+    moveTl.to("#hero-text", { opacity: 0, y: -50, immediateRender: false }, 0);
 
 
     // --- 3. CARD REVEALS ---
@@ -484,6 +466,7 @@
         duration: 0.2
     });
 
+    // GLITCH FIX: Ensure smooth exit
     gsap.to("#global-phone", {
         scrollTrigger: {
             trigger: "#section-cta",
@@ -491,27 +474,24 @@
             scrub: 1
         },
         y: "-120vh",
-        opacity: 0
+        opacity: 0,
+        immediateRender: false
     });
 
-    // --- 5. AJAX FORM SUBMISSION (NO REDIRECT) ---
+    // --- 5. AJAX FORM SUBMISSION ---
     const form = document.getElementById("waitlist-form");
     
     async function handleSubmit(event) {
-      event.preventDefault(); // Stop the redirect!
+      event.preventDefault();
       const status = document.getElementById("form-status");
       const data = new FormData(event.target);
-      
-      // Update status to 'sending'
       status.innerHTML = "Sending...";
       status.className = "";
 
       fetch(event.target.action, {
         method: form.method,
         body: data,
-        headers: {
-            'Accept': 'application/json'
-        }
+        headers: { 'Accept': 'application/json' }
       }).then(response => {
         if (response.ok) {
           status.innerHTML = "You're on the list! We'll be in touch soon.";
