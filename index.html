@@ -13,13 +13,10 @@
     /* --- RESET & VARIABLES --- */
     :root {
       --bg-dark: #020617;
-      --bg-slate: #0f172a;
       --text-white: #f8fafc;
       --text-muted: #94a3b8;
-      --accent-glow: rgba(56, 189, 248, 0.5);
-      --phone-border: #334155;
       
-      /* Animation Variables (Controlled by JS) */
+      /* Animation Variable */
       --scroll-progress: 0; 
     }
 
@@ -28,7 +25,6 @@
       margin: 0;
       padding: 0;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
@@ -46,12 +42,9 @@
       padding: 0 24px;
     }
 
-    h1, h2, h3 { font-weight: 700; letter-spacing: -0.025em; }
-    p { color: var(--text-muted); font-size: 1.1rem; }
-
-    /* --- HERO SECTION (SCROLL TRIGGER) --- */
+    /* --- HERO SECTION --- */
     .hero {
-      height: 300vh; /* Determines length of animation */
+      height: 300vh; /* Long scroll track */
       position: relative;
     }
 
@@ -59,27 +52,35 @@
       position: sticky;
       top: 0;
       height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      
+      /* FLEX COLUMN LAYOUT: Keeps text top, phone bottom */
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      /* Smooth background transition based on scroll */
+      justify-content: flex-start; 
+      padding-top: 60px; /* Space from top of browser */
+      padding-bottom: 20px;
+
+      /* Dynamic Background */
       background: radial-gradient(
-        circle at 50% -20%, 
+        circle at 50% 0%, 
         #1e293b calc(100% - (var(--scroll-progress) * 100%)), 
         #000000 100%
       );
     }
 
-    /* --- TEXT CONTENT --- */
+    /* --- TEXT CONTENT (TOP) --- */
     .hero-content {
       text-align: center;
       z-index: 10;
-      margin-top: -60px; /* Pull up slightly */
-      opacity: calc(1 - (var(--scroll-progress) * 3)); /* Fade out text as we scroll */
-      transform: translateY(calc(var(--scroll-progress) * -50px));
-      pointer-events: calc(1 - var(--scroll-progress)); /* Disable clicks when faded */
+      flex-shrink: 0; /* Don't squash the text */
+      margin-bottom: 40px; /* Space between text and phone */
+      transition: opacity 0.3s ease;
+      
+      /* Slight fade out as you scroll deep */
+      opacity: calc(1 - (var(--scroll-progress) * 2.5));
     }
 
     .pill {
@@ -92,68 +93,75 @@
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: #cbd5e1;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       backdrop-filter: blur(10px);
     }
 
     .hero-title {
-      font-size: clamp(3rem, 8vw, 5rem);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
       line-height: 1.1;
       background: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      font-weight: 700;
     }
 
     .hero-subtitle {
-      max-width: 600px;
+      max-width: 500px;
       margin: 0 auto;
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       color: #94a3b8;
     }
 
-    /* --- PHONE VISUAL --- */
+    /* --- PHONE VISUAL (BOTTOM) --- */
     .phone-stage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -40%); /* Starts slightly lower */
-      width: 340px;
-      height: 680px;
+      position: relative;
       z-index: 20;
+      
+      /* RESPONSIVE SIZING LOGIC */
+      width: auto;
+      height: 100%; 
+      /* Provide an aspect ratio to maintain shape */
+      aspect-ratio: 9 / 19; 
+      
+      /* CRITICAL: Limit height so it fits on screen without cutting off */
+      max-height: 60vh; 
+      
+      /* Center it */
+      margin: 0 auto;
     }
 
-    /* The glowing aura behind the phone */
     .phone-glow {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 120%; height: 80%;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
-      filter: blur(60px);
-      opacity: calc(1 - var(--scroll-progress)); /* Glow fades in focused mode */
+      width: 150%; height: 100%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 60%);
+      filter: blur(50px);
+      opacity: calc(1 - var(--scroll-progress));
       transition: opacity 0.5s ease;
+      pointer-events: none;
     }
 
     .phone-device {
       width: 100%;
       height: 100%;
       background: #000;
-      border-radius: 50px;
+      border-radius: 40px; /* Adaptive border radius */
       box-shadow: 
         0 0 0 1px #334155,
         0 20px 50px -10px rgba(0,0,0,0.8);
       position: relative;
       overflow: hidden;
-      /* Physics-based scaling effect */
       transform: scale(calc(1 + (var(--scroll-progress) * 0.05))); 
     }
 
     .notch {
       position: absolute;
-      top: 18px; left: 50%;
+      top: 15px; left: 50%;
       transform: translateX(-50%);
-      width: 100px; height: 28px;
+      width: 30%; height: 25px;
       background: #000;
       border-radius: 20px;
       z-index: 50;
@@ -164,185 +172,153 @@
       position: absolute;
       inset: 0;
       overflow: hidden;
-      border-radius: 48px;
+      border-radius: 38px;
       background: #000;
     }
 
     .status-bar {
       position: absolute;
-      top: 18px; left: 24px; right: 24px;
+      top: 15px; left: 20px; right: 20px;
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       z-index: 40;
       color: #fff;
     }
 
-    /* LAYER 1: CHAOS (The colorful apps) */
+    /* LAYER 1: CHAOS */
     .layer-chaos {
       position: absolute;
       inset: 0;
-      padding: 60px 20px 20px;
+      padding: 50px 15px 15px; /* Compact padding */
       background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
       
-      /* Animation Logic: Fade out & Blur out */
       opacity: calc(1 - (var(--scroll-progress) * 1.5));
       filter: blur(calc(var(--scroll-progress) * 10px));
       transform: scale(calc(1 - (var(--scroll-progress) * 0.1)));
       transform-origin: center center;
-      will-change: opacity, transform, filter;
     }
 
-    /* GRID FIX: Precise alignment */
     .app-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 15px 10px;
+      gap: 12px 8px; /* Tighter gap */
       margin-top: 10px;
     }
 
+    .app-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .app-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 12px;
+      width: 100%;
+      aspect-ratio: 1/1; /* Force Square */
+      border-radius: 22%;
       overflow: hidden;
-      margin: 0 auto 4px;
-      position: relative;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      margin-bottom: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     
     .app-icon img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Ensures strict squares */
+      object-fit: cover;
+      display: block;
     }
 
     .app-label {
-      font-size: 10px;
+      font-size: 9px;
       text-align: center;
       color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
     }
 
     .dock-glass {
       position: absolute;
-      bottom: 20px; left: 16px; right: 16px;
-      height: 85px;
+      bottom: 15px; left: 12px; right: 12px;
+      height: 75px;
       background: rgba(255,255,255,0.15);
       backdrop-filter: blur(20px);
-      border-radius: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-evenly;
+      border-radius: 30px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 10px;
       border: 1px solid rgba(255,255,255,0.1);
+      align-items: center;
     }
 
-    /* LAYER 2: SLATE (The Dumbphone) */
+    /* LAYER 2: SLATE (DUMBPHONE) */
     .layer-slate {
       position: absolute;
       inset: 0;
-      padding: 60px 24px 40px;
+      padding: 50px 20px 30px;
       background: #000;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
 
-      /* Animation Logic: Fade IN & Unblur */
       opacity: var(--scroll-progress);
-      /* Starts slightly larger and scales down to 1 */
       transform: scale(calc(1.1 - (var(--scroll-progress) * 0.1)));
       filter: blur(calc((1 - var(--scroll-progress)) * 10px));
-      will-change: opacity, transform, filter;
     }
 
     .slate-time {
-      font-size: 3.5rem;
+      font-size: 3rem;
       font-weight: 300;
       text-align: center;
       color: #fff;
-      margin-top: 20px;
+      margin-top: 10px;
       letter-spacing: -2px;
     }
 
     .slate-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       margin-bottom: auto;
-      margin-top: 40px;
+      margin-top: 30px;
     }
 
     .slate-item {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: #fff;
-      border-bottom: 1px solid #333;
-      padding-bottom: 12px;
+      border-bottom: 1px solid #222;
+      padding-bottom: 10px;
       font-weight: 400;
     }
 
     .slate-dock {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
     }
 
     .slate-btn {
       flex: 1;
-      height: 60px;
-      border-radius: 20px;
+      height: 50px;
+      border-radius: 16px;
       background: #1c1c1e;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
     }
-    .slate-btn svg { width: 24px; height: 24px; stroke-width: 2; }
+    .slate-btn svg { width: 22px; height: 22px; stroke-width: 2; }
 
-    /* --- FLOATING ICONS AROUND PHONE --- */
-    .floater-container {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 15;
-    }
-    
-    .floater {
-      position: absolute;
-      width: 60px; height: 60px;
-      border-radius: 16px;
-      background: #fff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      animation: float 6s ease-in-out infinite;
-      
-      /* Animation: Fly away when focused */
-      opacity: calc(1 - (var(--scroll-progress) * 2));
-      transform: translate(
-        calc(var(--scroll-progress) * var(--x-dir) * 100px), 
-        calc(var(--scroll-progress) * -200px)
-      ) rotate(calc(var(--scroll-progress) * 20deg));
-    }
-    
-    .floater img { width: 100%; height: 100%; border-radius: 16px; }
-
-    /* Floating positions */
-    .f1 { top: 20%; left: 15%; --x-dir: -1; animation-delay: 0s; }
-    .f2 { top: 30%; right: 15%; --x-dir: 1; animation-delay: -2s; }
-    .f3 { bottom: 30%; left: 10%; --x-dir: -1.5; animation-delay: -1s; }
-    .f4 { bottom: 40%; right: 10%; --x-dir: 1.5; animation-delay: -3s; }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-15px); }
-    }
-
-    /* --- CONTENT SECTIONS BELOW --- */
+    /* --- CONTENT SECTIONS --- */
     .content-section {
       position: relative;
       background: #f8fafc;
       color: #0f172a;
       padding: 100px 0;
-      z-index: 30; /* Sit above hero */
+      z-index: 30;
     }
 
     .grid-3 {
@@ -363,7 +339,7 @@
     
     .card:hover { transform: translateY(-5px); }
     
-    .card h3 { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; }
+    .card h3 { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
     .card p { color: #64748b; font-size: 1rem; }
     .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
 
@@ -399,8 +375,8 @@
     /* Mobile adjustments */
     @media (max-width: 768px) {
       .hero-title { font-size: 3rem; }
-      .phone-stage { width: 280px; height: 580px; }
-      .floater { display: none; } /* Hide floating icons on mobile for cleaner look */
+      .phone-stage { max-height: 55vh; } /* Even smaller on mobile to clear text */
+      .app-label { display: none; } /* Hide labels on very small screens for cleaner look */
     }
   </style>
 </head>
@@ -411,7 +387,7 @@
       
       <div class="hero-content container">
         <div class="pill">Return to Focus</div>
-        <h1 class="hero-title">clean SLATE</h1>
+        <h1 class="hero-title">Clean SLATE</h1>
         <p class="hero-subtitle">
           Mac app + MDM supervision. Turn your addictive slot machine back into a simple tool.
         </p>
@@ -420,13 +396,6 @@
       <div class="phone-stage">
         <div class="phone-glow"></div>
         
-        <div class="floater-container">
-          <div class="floater f1"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt=""></div>
-          <div class="floater f2"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt=""></div>
-          <div class="floater f3"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt=""></div>
-          <div class="floater f4"><img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt=""></div>
-        </div>
-
         <div class="phone-device">
           <div class="notch"></div>
           
@@ -438,7 +407,7 @@
 
             <div class="layer-chaos">
               <div class="app-grid">
-                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt=""></div><div class="app-label">Insta</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt=""></div><div class="app-label">Instagram</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt=""></div><div class="app-label">YouTube</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt=""></div><div class="app-label">Telegram</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg" alt=""></div><div class="app-label">Mail</div></div>
@@ -453,9 +422,10 @@
               </div>
               
               <div class="dock-glass">
-                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" alt=""></div>
-                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" alt=""></div>
-                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" alt=""></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" alt=""></div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" alt=""></div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" alt=""></div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Apple_Music_icon.png" alt=""></div></div>
               </div>
             </div>
 
@@ -531,27 +501,20 @@
     const root = document.documentElement;
 
     function updateScroll() {
-      // Calculate how far down the hero section we are (0 to 1)
       const scrollTop = window.scrollY;
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
       
-      // We want the animation to complete before the hero section is fully scrolled out
-      // 0 = top of page, 1 = bottom of hero section
       let progress = scrollTop / (heroHeight - viewportHeight);
       
-      // Clamp between 0 and 1
       if (progress < 0) progress = 0;
       if (progress > 1) progress = 1;
 
-      // Update CSS Variable - this is much more performant than changing individual styles
       root.style.setProperty('--scroll-progress', progress);
 
-      // Keep the loop running
       requestAnimationFrame(updateScroll);
     }
 
-    // Start the loop
     requestAnimationFrame(updateScroll);
   </script>
 
