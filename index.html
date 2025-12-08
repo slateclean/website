@@ -4,927 +4,555 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SLATE | Return to Focus</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
+    /* --- RESET & VARIABLES --- */
     :root {
-      --text-color: #f9fafb;
-      --muted-text: #9ca3af;
-      --phone-border: rgba(148, 163, 184, 0.36);
-      --focus-progress: 0;   /* 0 = chaos, 1 = dumbphone */
-      --chaos-progress: 0;   /* 0 = calm, 1 = full chaos */
+      --bg-dark: #020617;
+      --bg-slate: #0f172a;
+      --text-white: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-glow: rgba(56, 189, 248, 0.5);
+      --phone-border: #334155;
+      
+      /* Animation Variables (Controlled by JS) */
+      --scroll-progress: 0; 
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(circle at 0% -40%, #38bdf8 0%, #0f172a 36%, #000 100%);
-      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-white);
       line-height: 1.6;
       overflow-x: hidden;
-      transition: background 0.9s ease;
     }
 
-    body.is-focused {
-      background: radial-gradient(circle at 50% -60%, #020617 0%, #020617 40%, #000 100%);
-    }
-
+    /* --- UTILITIES --- */
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 24px;
     }
 
-    section { padding: 80px 0; }
+    h1, h2, h3 { font-weight: 700; letter-spacing: -0.025em; }
+    p { color: var(--text-muted); font-size: 1.1rem; }
 
-    h1, h2, h3 {
-      letter-spacing: -0.03em;
-      font-weight: 700;
-    }
-
-    p {
-      color: var(--muted-text);
-      font-size: 1.05rem;
-    }
-
-    /* HERO SCROLL-HOLD */
-
+    /* --- HERO SECTION (SCROLL TRIGGER) --- */
     .hero {
-      height: 260vh;              /* long scroll region for animation */
+      height: 300vh; /* Determines length of animation */
       position: relative;
-      padding: 0;
-      overflow: visible;
     }
 
-    .hero-inner {
+    .hero-sticky {
       position: sticky;
       top: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding-top: 72px;
-      padding-bottom: 120px;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      opacity: 0.32;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.25), transparent 55%),
-        radial-gradient(circle at 80% 0%, rgba(236, 72, 153, 0.18), transparent 55%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .hero-inner > .container {
-      position: relative;
-      z-index: 1;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      /* Smooth background transition based on scroll */
+      background: radial-gradient(
+        circle at 50% -20%, 
+        #1e293b calc(100% - (var(--scroll-progress) * 100%)), 
+        #000000 100%
+      );
     }
 
-    .hero-kicker {
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
+    /* --- TEXT CONTENT --- */
+    .hero-content {
+      text-align: center;
+      z-index: 10;
+      margin-top: -60px; /* Pull up slightly */
+      opacity: calc(1 - (var(--scroll-progress) * 3)); /* Fade out text as we scroll */
+      transform: translateY(calc(var(--scroll-progress) * -50px));
+      pointer-events: calc(1 - var(--scroll-progress)); /* Disable clicks when faded */
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       font-size: 0.75rem;
-      color: rgba(148, 163, 184, 0.9);
-      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #cbd5e1;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
     }
 
     .hero-title {
-      font-size: clamp(2.7rem, 6vw, 3.6rem);
-      margin-bottom: 12px;
+      font-size: clamp(3rem, 8vw, 5rem);
+      line-height: 1.1;
+      background: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
     }
 
     .hero-subtitle {
-      max-width: 620px;
+      max-width: 600px;
       margin: 0 auto;
-      font-size: 1.05rem;
-      color: rgba(209, 213, 219, 0.95);
+      font-size: 1.25rem;
+      color: #94a3b8;
     }
 
-    .hero-tagline {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      color: rgba(148, 163, 184, 0.95);
-    }
-
-    .hero-visual {
-      position: relative;
-      width: 100%;
-      max-width: 720px;
-      height: 520px;
-      margin-top: 52px;
-    }
-
-    /* PHONE + GLOW */
-
-    .hero-glow {
+    /* --- PHONE VISUAL --- */
+    .phone-stage {
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 380px;
-      height: 380px;
-      transform: translate(-50%, -50%);
-      background:
-        radial-gradient(circle at 50% 30%, rgba(56, 189, 248, 0.35), transparent 60%),
-        radial-gradient(circle at 50% 70%, rgba(168, 85, 247, 0.3), transparent 65%);
-      filter: blur(32px);
-      opacity: 0.9;
-      z-index: 1;
-      pointer-events: none;
+      transform: translate(-50%, -40%); /* Starts slightly lower */
+      width: 340px;
+      height: 680px;
+      z-index: 20;
     }
 
-    .phone-wrapper {
+    /* The glowing aura behind the phone */
+    .phone-glow {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 320px;
-      height: 650px;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      padding: 14px;
-      border-radius: 44px;
-      background: radial-gradient(circle at 0% 0%, #020617 0%, #020617 50%, #020617 100%);
-      box-shadow:
-        0 30px 90px rgba(0, 0, 0, 0.9),
-        0 0 0 1px rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--phone-border);
-      z-index: 3;
+      width: 120%; height: 80%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+      filter: blur(60px);
+      opacity: calc(1 - var(--scroll-progress)); /* Glow fades in focused mode */
+      transition: opacity 0.5s ease;
     }
 
-    .phone-frame {
-      position: relative;
+    .phone-device {
       width: 100%;
       height: 100%;
-      border-radius: 36px;
       background: #000;
+      border-radius: 50px;
+      box-shadow: 
+        0 0 0 1px #334155,
+        0 20px 50px -10px rgba(0,0,0,0.8);
+      position: relative;
       overflow: hidden;
+      /* Physics-based scaling effect */
+      transform: scale(calc(1 + (var(--scroll-progress) * 0.05))); 
     }
 
     .notch {
       position: absolute;
-      top: 16px;
-      left: 50%;
+      top: 18px; left: 50%;
       transform: translateX(-50%);
-      width: 120px;
-      height: 32px;
-      background: #020617;
-      border-radius: 999px;
-      z-index: 10;
-      box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.9),
-        0 10px 20px rgba(0, 0, 0, 0.85);
+      width: 100px; height: 28px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
     }
 
-    .phone-screen {
+    /* --- SCREEN LAYERS --- */
+    .screen {
       position: absolute;
       inset: 0;
-      border-radius: 34px;
       overflow: hidden;
-      background: #020617;
+      border-radius: 48px;
+      background: #000;
     }
 
-    .screen-layer {
+    .status-bar {
+      position: absolute;
+      top: 18px; left: 24px; right: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 40;
+      color: #fff;
+    }
+
+    /* LAYER 1: CHAOS (The colorful apps) */
+    .layer-chaos {
       position: absolute;
       inset: 0;
-      transition:
-        opacity 0.45s ease,
-        transform 0.45s ease,
-        filter 0.45s ease;
+      padding: 60px 20px 20px;
+      background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+      
+      /* Animation Logic: Fade out & Blur out */
+      opacity: calc(1 - (var(--scroll-progress) * 1.5));
+      filter: blur(calc(var(--scroll-progress) * 10px));
+      transform: scale(calc(1 - (var(--scroll-progress) * 0.1)));
+      transform-origin: center center;
+      will-change: opacity, transform, filter;
     }
 
-    /* CHAOS LAYER */
-
-    .screen-layer-chaos {
-      padding: 52px 18px 22px;
-      background: linear-gradient(
-        180deg,
-        #4f46e5 0%,
-        #ec4899 35%,
-        #fb923c 78%,
-        #facc15 100%
-      );
-      opacity: calc(1 - var(--focus-progress));
-      filter: blur(calc(var(--focus-progress) * 3px));
-      transform: translateY(calc(var(--focus-progress) * -12px));
+    /* GRID FIX: Precise alignment */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px 10px;
+      margin-top: 10px;
     }
 
-    /* DUMBPHONE LAYER (MATCHES YOUR SCREENSHOT) */
+    .app-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto 4px;
+      position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    .app-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Ensures strict squares */
+    }
 
-    .screen-layer-slate {
-      padding: 52px 24px 24px;
+    .app-label {
+      font-size: 10px;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .dock-glass {
+      position: absolute;
+      bottom: 20px; left: 16px; right: 16px;
+      height: 85px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* LAYER 2: SLATE (The Dumbphone) */
+    .layer-slate {
+      position: absolute;
+      inset: 0;
+      padding: 60px 24px 40px;
       background: #000;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      opacity: var(--focus-progress);
-      filter: blur(calc((1 - var(--focus-progress)) * 3px));
-      transform: translateY(calc((1 - var(--focus-progress)) * 18px));
+
+      /* Animation Logic: Fade IN & Unblur */
+      opacity: var(--scroll-progress);
+      /* Starts slightly larger and scales down to 1 */
+      transform: scale(calc(1.1 - (var(--scroll-progress) * 0.1)));
+      filter: blur(calc((1 - var(--scroll-progress)) * 10px));
+      will-change: opacity, transform, filter;
     }
 
-    /* STATUS BAR */
-
-    .screen-status {
-      position: absolute;
-      top: 18px;
-      left: 0;
-      right: 0;
-      padding: 0 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      z-index: 4;
+    .slate-time {
+      font-size: 3.5rem;
+      font-weight: 300;
+      text-align: center;
+      color: #fff;
+      margin-top: 20px;
+      letter-spacing: -2px;
     }
 
-    .screen-status--light {
-      color: #f9fafb;
-      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.6);
-    }
-
-    .screen-status--dark {
-      color: #f9fafb;
-    }
-
-    /* CHAOS CONTENT */
-
-    .screen-chaos-body {
-      margin-top: 8px;
-      position: relative;
-    }
-
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 22px 12px;
-      padding: 15px 4px 0;
-    }
-
-    .app-item {
+    .slate-list {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      opacity: calc(0.1 + 0.9 * var(--chaos-progress));
-      transform: translateY(calc((1 - var(--chaos-progress)) * 24px));
-      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
-    }
-
-    .app-icon-img {
-      width: 53px;
-      height: 53px;
-      border-radius: 12px;
-      object-fit: cover;
-      margin-bottom: 5px;
-      box-shadow: 0 5px 10px rgba(15, 23, 42, 0.35);
-      background: white;
-    }
-
-    .app-name {
-      font-size: 10px;
-      color: #f9fafb;
-      font-weight: 500;
-      text-shadow: 0 1px 2px rgba(15, 23, 42, 0.9);
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-    }
-
-    .distracted-dock {
-      position: absolute;
-      bottom: 0;
-      left: 10px;
-      right: 10px;
-      height: 80px;
-      background: rgba(15, 23, 42, 0.35);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 32px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 0 10px;
-      box-shadow: 0 14px 40px rgba(15, 23, 42, 0.8);
-    }
-
-    .distracted-dock .app-item .app-name { display: none; }
-
-    /* DUMBPHONE ICON GRID (2x3) */
-
-    .slate-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding-top: 40px; /* space below status bar */
-    }
-
-    .slate-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 32px 28px;
-      justify-items: center;
-    }
-
-    .slate-app {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .slate-icon-box {
-      width: 72px;
-      height: 72px;
-      border-radius: 24px;
-      background: #26262a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
-    }
-
-    .slate-icon-box svg {
-      width: 30px;
-      height: 30px;
-      stroke: #f9fafb;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .slate-label {
-      font-size: 12px;
-      color: #f9fafb;
-    }
-
-    /* DOCK (BOTTOM) */
-
-    .slate-dock-container {
+      gap: 16px;
+      margin-bottom: auto;
       margin-top: 40px;
     }
 
+    .slate-item {
+      font-size: 1.4rem;
+      color: #fff;
+      border-bottom: 1px solid #333;
+      padding-bottom: 12px;
+      font-weight: 400;
+    }
+
     .slate-dock {
-      background: #18181b;
-      border-radius: 40px;
-      padding: 18px 26px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
+      gap: 12px;
     }
 
-    .slate-dock .slate-icon-box {
-      width: 56px;
-      height: 56px;
-      border-radius: 20px;
-      background: #232326;
-      box-shadow: none;
-    }
-
-    /* FLOATING DISTRACTION ICONS AROUND PHONE */
-
-    .floating-icon {
-      position: absolute;
-      width: 60px;
+    .slate-btn {
+      flex: 1;
       height: 60px;
       border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
-      background: #fff;
-      animation: floatPulse 9s ease-in-out infinite;
-      z-index: 2;
-      opacity: calc(0.1 + 0.9 * var(--chaos-progress));
-      transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
-    }
-
-    .floating-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .icon-1 { top: 8%; left: 16%;  animation-duration: 10s;  animation-delay: -2s; }
-    .icon-2 { top: 18%; right: 10%; animation-duration: 11s; animation-delay: -4s; }
-    .icon-3 { top: 50%; left: 4%;   animation-duration: 9.5s; animation-delay: -1s; }
-    .icon-4 { top: 62%; right: 6%;  animation-duration: 12s;  animation-delay: -5s; }
-    .icon-5 { bottom: 10%; left:20%;animation-duration: 10.5s;animation-delay: -3s; }
-    .icon-6 { bottom: 14%; right:18%;animation-duration: 9s;  animation-delay: -1.5s; }
-
-    @keyframes floatPulse {
-      0%   { transform: translate3d(0, 0, 0) scale(1); }
-      25%  { transform: translate3d(0, -14px, 0) scale(1.03); }
-      50%  { transform: translate3d(0, -4px, 0) scale(1); }
-      75%  { transform: translate3d(0, -18px, 0) scale(1.05); }
-      100% { transform: translate3d(0, 0, 0) scale(1); }
-    }
-
-    body.is-focused .floating-icon {
-      opacity: 0;
-      filter: blur(6px);
-      transform: translate3d(0, -80px, 0) scale(0.7);
-      pointer-events: none;
-    }
-
-    /* SECTIONS BELOW HERO */
-
-    .steps-section {
-      background: #f9fafb;
-      color: #0f172a;
-      padding-top: 80px;
-      padding-bottom: 80px;
-    }
-
-    .steps-section h2 { color: #020617; }
-
-    .steps-section p { color: #4b5563; }
-
-    .step-container {
+      background: #1c1c1e;
       display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 40px;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
     }
+    .slate-btn svg { width: 24px; height: 24px; stroke-width: 2; }
 
-    .step {
-      flex: 1;
-      min-width: 250px;
-      padding: 24px 20px;
+    /* --- FLOATING ICONS AROUND PHONE --- */
+    .floater-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 15;
+    }
+    
+    .floater {
+      position: absolute;
+      width: 60px; height: 60px;
       border-radius: 16px;
-      border: 1px solid #e5e7eb;
-      background: #ffffff;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s.ease;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: float 6s ease-in-out infinite;
+      
+      /* Animation: Fly away when focused */
+      opacity: calc(1 - (var(--scroll-progress) * 2));
+      transform: translate(
+        calc(var(--scroll-progress) * var(--x-dir) * 100px), 
+        calc(var(--scroll-progress) * -200px)
+      ) rotate(calc(var(--scroll-progress) * 20deg));
+    }
+    
+    .floater img { width: 100%; height: 100%; border-radius: 16px; }
+
+    /* Floating positions */
+    .f1 { top: 20%; left: 15%; --x-dir: -1; animation-delay: 0s; }
+    .f2 { top: 30%; right: 15%; --x-dir: 1; animation-delay: -2s; }
+    .f3 { bottom: 30%; left: 10%; --x-dir: -1.5; animation-delay: -1s; }
+    .f4 { bottom: 40%; right: 10%; --x-dir: 1.5; animation-delay: -3s; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
     }
 
-    .step:hover {
-      transform: translateY(-4px);
-      border-color: #d4d4d8;
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-    }
-
-    .step-number {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #9ca3af;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-    }
-
-    .step h3 { margin-bottom: 8px; }
-
-    .cta-section {
-      text-align: center;
+    /* --- CONTENT SECTIONS BELOW --- */
+    .content-section {
+      position: relative;
+      background: #f8fafc;
+      color: #0f172a;
       padding: 100px 0;
-      background: radial-gradient(circle at 10% 0%, #1f2933 0%, #020617 50%, #000 100%);
+      z-index: 30; /* Sit above hero */
     }
 
-    .cta-section h2 {
-      font-size: clamp(2rem, 4vw, 2.6rem);
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-top: 60px;
     }
 
-    .cta-section p {
-      margin: 20px 0;
-      color: rgba(209, 213, 219, 0.9);
+    .card {
+      background: #fff;
+      padding: 32px;
+      border-radius: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s;
     }
+    
+    .card:hover { transform: translateY(-5px); }
+    
+    .card h3 { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; }
+    .card p { color: #64748b; font-size: 1rem; }
+    .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
 
-    .btn-primary {
+    .cta {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 120px 0;
+    }
+    
+    .btn-main {
       display: inline-block;
-      background-color: #0f172a;
-      color: white;
-      padding: 16px 32px;
+      margin-top: 30px;
+      background: #fff;
+      color: #000;
+      padding: 18px 40px;
       border-radius: 999px;
-      font-size: 1.05rem;
-      font-weight: 600;
       text-decoration: none;
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    .btn-primary:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.8);
-    }
-
-    .price {
-      margin-top: 16px;
-      font-size: 0.9rem;
-      color: rgba(148, 163, 184, 0.95);
-    }
+    .btn-main:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.4); }
 
     footer {
+      background: #000;
+      color: #475569;
       text-align: center;
       padding: 40px;
-      font-size: 0.8rem;
-      color: #6b7280;
-      background: #020617;
-      border-top: 1px solid #111827;
+      border-top: 1px solid #1e293b;
+      font-size: 0.9rem;
     }
 
-    /* RESPONSIVE */
-
+    /* Mobile adjustments */
     @media (max-width: 768px) {
-      .hero { height: 260vh; }
-      .hero-inner { padding-top: 56px; padding-bottom: 96px; }
-      .hero-visual { height: 480px; }
-      .phone-wrapper { width: 280px; height: 580px; }
-      .floating-icon { width: 52px; height: 52px; }
-      .step-container { flex-direction: column; }
+      .hero-title { font-size: 3rem; }
+      .phone-stage { width: 280px; height: 580px; }
+      .floater { display: none; } /* Hide floating icons on mobile for cleaner look */
     }
   </style>
 </head>
 <body>
 
-  <!-- HERO (SCROLL-HOLD) -->
   <section class="hero">
-    <div class="hero-inner">
-      <div class="container">
-        <div class="hero-copy">
-          <div class="hero-kicker">Built for focus</div>
-          <h1 class="hero-title">clean SLATE</h1>
-          <p class="hero-subtitle">
-            Turn your iPhone into a dumbphone when it matters most. Strip away the slot machines, keep only what’s essential, and get your attention span back.
-          </p>
-          <div class="hero-tagline">
-            Mac app + MDM supervision → distraction-free home screen, on demand.
-          </div>
+    <div class="hero-sticky">
+      
+      <div class="hero-content container">
+        <div class="pill">Return to Focus</div>
+        <h1 class="hero-title">clean SLATE</h1>
+        <p class="hero-subtitle">
+          Mac app + MDM supervision. Turn your addictive slot machine back into a simple tool.
+        </p>
+      </div>
+
+      <div class="phone-stage">
+        <div class="phone-glow"></div>
+        
+        <div class="floater-container">
+          <div class="floater f1"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt=""></div>
+          <div class="floater f2"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt=""></div>
+          <div class="floater f3"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt=""></div>
+          <div class="floater f4"><img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt=""></div>
         </div>
 
-        <div class="hero-visual">
-          <div class="hero-glow"></div>
+        <div class="phone-device">
+          <div class="notch"></div>
+          
+          <div class="screen">
+            <div class="status-bar">
+              <span>9:41</span>
+              <svg width="20" height="12" viewBox="0 0 24 12" fill="white"><path d="M16 4h-2V2h2v2zm0 4h-2V6h2v2zm4-4h-2V2h2v2zm0 4h-2V6h2v2zm-8-4H8V2h4v2zm0 4H8V6h4v2z" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
 
-          <!-- PHONE -->
-          <div class="phone-wrapper">
-            <div class="phone-frame">
-              <div class="notch"></div>
-              <div class="phone-screen">
-                <!-- CHAOS LAYER -->
-                <div class="screen-layer screen-layer-chaos">
-                  <div class="screen-status screen-status--light">
-                    <span>22:34</span>
-                    <div style="display:flex; gap:4px; align-items:center;">
-                      <svg width="18" height="12" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                      </svg>
-                      <svg width="18" height="12" viewBox="0 0 24 24" fill="white">
-                        <path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/>
-                      </svg>
-                    </div>
-                  </div>
+            <div class="layer-chaos">
+              <div class="app-grid">
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt=""></div><div class="app-label">Insta</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt=""></div><div class="app-label">YouTube</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt=""></div><div class="app-label">Telegram</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg" alt=""></div><div class="app-label">Mail</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt=""></div><div class="app-label">X</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Podcasts_%28iOS%29.svg" alt=""></div><div class="app-label">Podcasts</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt=""></div><div class="app-label">Spotify</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt=""></div><div class="app-label">Reddit</div></div>
+                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Gold_coin_icon.png/1200px-Gold_coin_icon.png" alt=""></div><div class="app-label">Crypto</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Linkedin.svg" alt=""></div><div class="app-label">LinkedIn</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Apple_Notes_icon.png" alt=""></div><div class="app-label">Notes</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Photos_iOS_icon.svg" alt=""></div><div class="app-label">Photos</div></div>
+              </div>
+              
+              <div class="dock-glass">
+                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" alt=""></div>
+                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" alt=""></div>
+                <div class="app-icon" style="margin:0"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" alt=""></div>
+              </div>
+            </div>
 
-                  <div class="screen-chaos-body">
-                    <div class="app-grid">
-                      <!-- same icons you had before -->
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Phone_iOS.png" class="app-icon-img" alt="Phone">
-                        <span class="app-name">Phone</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Mail_%28iOS%29.svg" class="app-icon-img" alt="Mail" style="background:#2D9CDB">
-                        <span class="app-name">Mail</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" class="app-icon-img" alt="Telegram">
-                        <span class="app-name">Telegram</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="app-icon-img" alt="WhatsApp">
-                        <span class="app-name">WhatsApp</span>
-                      </div>
+            <div class="layer-slate">
+              <div class="slate-time">09:41</div>
+              
+              <div class="slate-list">
+                <div class="slate-item">Phone</div>
+                <div class="slate-item">Messages</div>
+                <div class="slate-item">Maps</div>
+                <div class="slate-item">Notes</div>
+                <div class="slate-item">Camera</div>
+                <div class="slate-item">Settings</div>
+              </div>
 
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" class="app-icon-img" alt="Halide" style="background:#111; filter:brightness(0.5);">
-                        <span class="app-name">Halide</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" class="app-icon-img" alt="Instagram">
-                        <span class="app-name">Instagram</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b6/Adobe_Photoshop_Lightroom_CC_logo.svg" class="app-icon-img" alt="Lightroom">
-                        <span class="app-name">Lightroom</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Photos_iOS_icon.svg" class="app-icon-img" alt="Photos">
-                        <span class="app-name">Photos</span>
-                      </div>
-
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" class="app-icon-img" alt="Apollo" style="background:white; padding:5px;">
-                        <span class="app-name">Apollo</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" class="app-icon-img" alt="Twitter" style="background:#1DA1F2; padding:8px;">
-                        <span class="app-name">Twitter</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Feed-icon.svg" class="app-icon-img" alt="Reeder" style="padding:5px; background:white;">
-                        <span class="app-name">Reeder</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Sun_icon.svg/1024px-Sun_icon.svg.png" class="app-icon-img" alt="Morning" style="background:white; padding:5px;">
-                        <span class="app-name">Morning</span>
-                      </div>
-
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Apple_Notes_icon.png" class="app-icon-img" alt="Notes">
-                        <span class="app-name">Notes</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" class="app-icon-img" alt="Formula 1" style="background:white; padding:10px;">
-                        <span class="app-name">Formula 1</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" class="app-icon-img" alt="Mimo" style="background:white; padding:8px;">
-                        <span class="app-name">Mimo</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Gold_coin_icon.png/1200px-Gold_coin_icon.png" class="app-icon-img" alt="CoinKeeper" style="background:white; padding:5px;">
-                        <span class="app-name">CoinKeeper</span>
-                      </div>
-
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="app-icon-img" alt="YouTube" style="background:white;">
-                        <span class="app-name">YouTube</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Audible_logo.svg/1024px-Audible_logo.svg.png" class="app-icon-img" alt="Audible" style="background:#F7941E; padding:5px;">
-                        <span class="app-name">Audible</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" class="app-icon-img" alt="Spotify">
-                        <span class="app-name">Spotify</span>
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Podcasts_%28iOS%29.svg/1024px-Podcasts_%28iOS%29.svg.png" class="app-icon-img" alt="Overcast">
-                        <span class="app-name">Overcast</span>
-                      </div>
-                    </div>
-
-                    <div class="distracted-dock">
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" class="app-icon-img" alt="Camera">
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" class="app-icon-img" alt="Messages">
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Asana_logo.svg" class="app-icon-img" alt="Asana" style="background:white; padding:10px;">
-                      </div>
-                      <div class="app-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" class="app-icon-img" alt="Safari" style="background:white;">
-                      </div>
-                    </div>
-                  </div>
+              <div class="slate-dock">
+                <div class="slate-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                 </div>
+                <div class="slate-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+              </div>
+            </div>
 
-                <!-- DUMBPHONE LAYER -->
-                <div class="screen-layer screen-layer-slate">
-                  <div class="screen-status screen-status--dark">
-                    <span>22:34</span>
-                    <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
-                      <rect x="1" y="1" width="18" height="10" rx="2" stroke="#f9fafb" stroke-width="1.5"/>
-                      <rect x="3" y="3" width="14" height="6" fill="#f9fafb"/>
-                      <path d="M22 4v4" stroke="#f9fafb" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </div>
+          </div>
+        </div>
+      </div>
 
-                  <div class="slate-screen">
-                    <div class="slate-grid">
-                      <!-- top row -->
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="7"></circle>
-                            <path d="M12 8v4l2 2"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Clock</span>
-                      </div>
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M3 6l7-3 4 2 7-3v16l-7 3-4-2-7 3z"></path>
-                            <path d="M10 5v14"></path>
-                            <path d="M14 6v14"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Maps</span>
-                      </div>
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <rect x="5" y="4" width="14" height="16" rx="2"></rect>
-                            <path d="M8 9h8M8 13h8M8 17h4"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Notes</span>
-                      </div>
-                      <!-- bottom row -->
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M5 4h3l2 4-2 2a11 11 0 0 0 6 6l2-2 4 2v3a3 3 0 0 1-3 3A13 13 0 0 1 4 7a3 3 0 0 1 3-3z"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Phone</span>
-                      </div>
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M4 5h16v10H7l-3 3z"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Messages</span>
-                      </div>
-                      <div class="slate-app">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 1 .33 1.82l-.1.2a2 2 0 0 1-2 1.1 7.25 7.25 0 0 0-1.7-.4l-.4 1.1a2 2 0 0 1-1.9 1.3h-1a2 2 0 0 1-1.9-1.3l-.4-1.1a7.25 7.25 0 0 0-1.7.4 2 2 0 0 1-2-1.1l-.1-.2A1.65 1.65 0 0 1 4.6 15L5 14a6.5 6.5 0 0 1 0-4l-.4-1A1.65 1.65 0 0 1 4.9 7l.1-.2a2 2 0 0 1 2-1.1 7.25 7.25 0 0 0 1.7.4l.4-1.1A2 2 0 0 1 11 4h1a2 2 0 0 1 1.9 1.3l.4 1.1a7.25 7.25 0 0 0 1.7-.4 2 2 0 0 1 2 1.1l.1.2a1.65 1.65 0 0 1-.33 1.82L19 10a6.5 6.5 0 0 1 0 4z"></path>
-                          </svg>
-                        </div>
-                        <span class="slate-label">Settings</span>
-                      </div>
-                    </div>
+    </div>
+  </section>
 
-                    <div class="slate-dock-container">
-                      <div class="slate-dock">
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M5 4h3l2 4-2 2a11 11 0 0 0 6 6l2-2 4 2v3a3 3 0 0 1-3 3A13 13 0 0 1 4 7a3 3 0 0 1 3-3z"></path>
-                          </svg>
-                        </div>
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M4 5h16v10H7l-3 3z"></path>
-                          </svg>
-                        </div>
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <rect x="4" y="7" width="16" height="12" rx="2"></rect>
-                            <circle cx="12" cy="13" r="3"></circle>
-                            <path d="M9 7l1-2h4l1 2"></path>
-                          </svg>
-                        </div>
-                        <div class="slate-icon-box">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M9 18V5l7-2v13"></path>
-                            <path d="M5 20l4-2"></path>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div><!-- /screen-layer-slate -->
-              </div><!-- /phone-screen -->
-            </div><!-- /phone-frame -->
-          </div><!-- /phone-wrapper -->
-
-          <!-- FLOATING ICONS -->
-          <div class="floating-icon icon-1">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
-          </div>
-          <div class="floating-icon icon-2">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube">
-          </div>
-          <div class="floating-icon icon-3">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Logo_of_Twitter.svg" alt="Twitter">
-          </div>
-          <div class="floating-icon icon-4">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt="Reddit">
-          </div>
-          <div class="floating-icon icon-5">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify">
-          </div>
-          <div class="floating-icon icon-6">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-          </div>
+  <section class="content-section">
+    <div class="container">
+      <h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 20px;">How it works</h2>
+      <p style="text-align:center; max-width:600px; margin:0 auto;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest via MDM protocols.</p>
+      
+      <div class="grid-3">
+        <div class="card">
+          <span class="step-num">Step 01</span>
+          <h3>Install on Mac</h3>
+          <p>Download the SLATE companion app. It acts as the command center for your devices.</p>
+        </div>
+        <div class="card">
+          <span class="step-num">Step 02</span>
+          <h3>Supervise</h3>
+          <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
+        </div>
+        <div class="card">
+          <span class="step-num">Step 03</span>
+          <h3>Shift</h3>
+          <p>Hit the switch. All distracting apps are hidden. Only utilities remain. Your phone is now a tool.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
-  <section class="steps-section">
+  <section class="cta">
     <div class="container">
-      <h2 style="text-align:center; margin-bottom:60px;">How it Works</h2>
-      <div class="step-container">
-        <div class="step">
-          <div class="step-number">Step 01</div>
-          <h3>Download on Mac</h3>
-          <p>Get the SLATE desktop companion app. This is your control center for shifting your iPhone between normal and dumbphone mode.</p>
-        </div>
-        <div class="step">
-          <div class="step-number">Step 02</div>
-          <h3>Connect &amp; Supervise</h3>
-          <p>Plug your iPhone in. Our guide walks you through enabling MDM supervision. It takes about two minutes and works entirely on your device.</p>
-        </div>
-        <div class="step">
-          <div class="step-number">Step 03</div>
-          <h3>Shift Mode</h3>
-          <p>Click “Shift”. Your colorful apps vanish, the UI turns minimal, and your phone becomes a tool again—not a slot machine.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="cta-section">
-    <div class="container">
-      <h2>Ready to go dumb?</h2>
-      <p>One-time purchase. No subscription. Flip into dumbphone mode whenever you need your brain back.</p>
-      <a href="https://stripe.com" class="btn-primary">Get SLATE for $99</a>
-      <div class="price">Includes Mac app + lifetime updates.</div>
+      <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
+      <p style="color:#94a3b8;">One-time purchase. Lifetime focus.</p>
+      <a href="#" class="btn-main">Get SLATE for $99</a>
     </div>
   </section>
 
   <footer>
-    <div class="container">
-      <p>&copy; 2025 SLATE Systems. Built for focus.</p>
-    </div>
+    &copy; 2025 SLATE Systems. Built for focus.
   </footer>
 
   <script>
-    // Scroll-hold mapping scroll → chaos/focus progress
-    (function () {
-      const root = document.documentElement;
-      const hero = document.querySelector('.hero');
-      if (!hero) return;
+    // --- HIGH PERFORMANCE SCROLL LOOP ---
+    const heroSection = document.querySelector('.hero');
+    const root = document.documentElement;
 
-      let start = 0;
-      let end = 1;
+    function updateScroll() {
+      // Calculate how far down the hero section we are (0 to 1)
+      const scrollTop = window.scrollY;
+      const heroHeight = heroSection.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      
+      // We want the animation to complete before the hero section is fully scrolled out
+      // 0 = top of page, 1 = bottom of hero section
+      let progress = scrollTop / (heroHeight - viewportHeight);
+      
+      // Clamp between 0 and 1
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
 
-      function recalcBounds() {
-        const heroTop = hero.offsetTop;
-        const heroHeight = hero.offsetHeight;
-        const viewport = window.innerHeight || document.documentElement.clientHeight || 1;
-        const span = Math.max(heroHeight - viewport, viewport * 0.5);
+      // Update CSS Variable - this is much more performant than changing individual styles
+      root.style.setProperty('--scroll-progress', progress);
 
-        start = heroTop;
-        end = heroTop + span;
-      }
+      // Keep the loop running
+      requestAnimationFrame(updateScroll);
+    }
 
-      function update() {
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        let progress = (scrollY - start) / (end - start);
-        if (progress < 0) progress = 0;
-        if (progress > 1) progress = 1;
-
-        // 0 → 0.45: fill with chaos
-        let chaosProgress = 0;
-        if (progress <= 0.45) {
-          chaosProgress = progress / 0.45;
-        } else {
-          chaosProgress = 1;
-        }
-
-        // 0.45 → 0.9: transition to dumbphone
-        let focusProgress = 0;
-        if (progress > 0.45 && progress < 0.9) {
-          focusProgress = (progress - 0.45) / 0.45;
-        } else if (progress >= 0.9) {
-          focusProgress = 1;
-        }
-
-        root.style.setProperty('--chaos-progress', chaosProgress.toFixed(3));
-        root.style.setProperty('--focus-progress', focusProgress.toFixed(3));
-
-        if (focusProgress >= 0.95) {
-          document.body.classList.add('is-focused');
-        } else {
-          document.body.classList.remove('is-focused');
-        }
-      }
-
-      recalcBounds();
-      update();
-
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', () => {
-        recalcBounds();
-        update();
-      });
-    })();
+    // Start the loop
+    requestAnimationFrame(updateScroll);
   </script>
 
 </body>
