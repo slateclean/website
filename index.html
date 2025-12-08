@@ -48,6 +48,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center; 
+      /* Gradient calculates based on progress, holding black at the end */
       background: radial-gradient(circle at 50% 50%, #1e293b calc(100% - (var(--scroll-progress) * 80%)), #000000 100%);
     }
 
@@ -101,6 +102,7 @@
 
     .title-slate {
         background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
+        /* Modified formula to bring text in slightly earlier and hold it */
         opacity: calc((var(--scroll-progress) * 3) - 1.2);
         transform: scale(calc(0.9 + (var(--scroll-progress) * 0.1)));
         filter: blur(calc((1 - var(--scroll-progress)) * 10px));
@@ -214,11 +216,29 @@
       margin-top: 60px;
     }
 
+    /* --- ANIMATION REVEAL CLASSES --- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Staggered delays for grid items */
+    .card:nth-child(1) { transition-delay: 0.1s; }
+    .card:nth-child(2) { transition-delay: 0.2s; }
+    .card:nth-child(3) { transition-delay: 0.3s; }
+
+
     .card {
       background: #fff; padding: 32px; border-radius: 24px;
       border: 1px solid #e2e8f0;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s;
+      transition: transform 0.2s, opacity 0.8s, transform 0.8s; /* Combine hover and reveal */
     }
     .card:hover { transform: translateY(-5px); }
     .card h3 { font-size: 1.25rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
@@ -279,21 +299,23 @@
 
   <section class="content-section">
     <div class="container">
-      <h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 20px;">How it works</h2>
-      <p style="text-align:center; max-width:600px; margin:0 auto;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest via MDM protocols.</p>
+      <div class="reveal">
+        <h2 style="text-align:center; font-size: 2.5rem; margin-bottom: 20px;">How it works</h2>
+        <p style="text-align:center; max-width:600px; margin:0 auto;">No willpower required. Just plug in your phone, click a button on your Mac, and we handle the rest via MDM protocols.</p>
+      </div>
       
       <div class="grid-3">
-        <div class="card">
+        <div class="card reveal">
           <span class="step-num">Step 01</span>
           <h3>Install on Mac</h3>
           <p>Download the SLATE companion app. It acts as the command center for your device.</p>
         </div>
-        <div class="card">
+        <div class="card reveal">
           <span class="step-num">Step 02</span>
           <h3>Supervise</h3>
           <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
         </div>
-        <div class="card">
+        <div class="card reveal">
           <span class="step-num">Step 03</span>
           <h3>Shift</h3>
           <p>Hit the switch. All distracting apps are hidden. Only utilities remain. Your phone is now a tool.</p>
@@ -303,7 +325,7 @@
   </section>
 
   <section class="cta">
-    <div class="container">
+    <div class="container reveal">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
       <p style="color:#94a3b8;">One-time purchase. Lifetime focus.</p>
       <a href="#" class="btn-main">Get SLATE for $99</a>
@@ -315,7 +337,7 @@
   </footer>
 
   <script>
-    // --- SCROLL ANIMATION LOOP ---
+    // --- SCROLL ANIMATION LOOP (HERO) ---
     const heroSection = document.querySelector('.hero');
     const root = document.documentElement;
 
@@ -324,16 +346,40 @@
       const heroHeight = heroSection.offsetHeight;
       const viewportHeight = window.innerHeight;
       
-      let progress = scrollTop / (heroHeight - viewportHeight);
+      // Calculate raw physical progress (0 to 1)
+      let rawProgress = scrollTop / (heroHeight - viewportHeight);
       
-      if (progress < 0) progress = 0;
-      if (progress > 1) progress = 1;
+      // Logic to prolong the final state:
+      // We map the animation 0-100% to occur within the first 75% of the scroll.
+      // This means for the last 25%, the value stays at 1.0 (holding the image).
+      let visualProgress = rawProgress / 0.75;
 
-      root.style.setProperty('--scroll-progress', progress);
+      if (visualProgress < 0) visualProgress = 0;
+      if (visualProgress > 1) visualProgress = 1;
+
+      root.style.setProperty('--scroll-progress', visualProgress);
       requestAnimationFrame(updateScroll);
     }
 
     requestAnimationFrame(updateScroll);
+
+
+    // --- SCROLL REVEAL OBSERVER ---
+    // This watches for elements with class 'reveal' entering the viewport
+    const observerOptions = {
+      threshold: 0.15 // Trigger when 15% of the element is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, observerOptions);
+
+    // Attach observer to all reveal elements
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 
 </body>
