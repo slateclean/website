@@ -15,8 +15,11 @@
       --bg-dark: #020617;
       --text-white: #f8fafc;
       --text-muted: #94a3b8;
-      --slate-icon-bg: #2c2c2e;
-      --slate-icon-color: #e5e5e7;
+      
+      /* Dumbphone Theme Colors (Match Image 2) */
+      --slate-bg: #000000;
+      --slate-icon-bg: #2c2c2e; /* Dark Grey for buttons */
+      --slate-icon-color: #ffffff;
       
       /* Animation Variable (0 = Top, 1 = Scrolled) */
       --scroll-progress: 0; 
@@ -36,8 +39,8 @@
 
     /* --- HERO SECTION --- */
     .hero {
-      /* INCREASED HEIGHT: Creates a longer "hold" feel */
-      height: 550vh; 
+      /* Long scroll track for extended hold time */
+      height: 600vh; 
       position: relative;
     }
 
@@ -53,6 +56,7 @@
       align-items: center;
       justify-content: center; 
       
+      /* Subtle background shift */
       background: radial-gradient(
         circle at 50% 50%, 
         #1e293b calc(100% - (var(--scroll-progress) * 80%)), 
@@ -65,10 +69,8 @@
       text-align: center;
       z-index: 10;
       flex-shrink: 0;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       margin-top: 40px;
-      
-      /* FIX: Removed opacity dependency so it's visible at start */
       position: relative;
     }
 
@@ -86,7 +88,6 @@
       backdrop-filter: blur(10px);
     }
 
-    /* Stack headings on top of each other */
     .heading-swapper {
         display: grid;
         place-items: center;
@@ -105,20 +106,18 @@
       transition: opacity 0.1s linear;
     }
 
-    /* HEADING 1: CHAOS (Visible at start) */
+    /* Heading 1: Digital Noise (Visible at Start) */
     .title-chaos {
         background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%);
-        /* Logic: Starts at 1, fades out by 40% scroll */
-        opacity: calc(1 - (var(--scroll-progress) * 2.5));
+        opacity: calc(1 - (var(--scroll-progress) * 3)); /* Fades out fast */
         transform: scale(calc(1 - (var(--scroll-progress) * 0.1)));
         filter: blur(calc(var(--scroll-progress) * 10px));
     }
 
-    /* HEADING 2: SLATE (Visible later) */
+    /* Heading 2: Clean SLATE (Visible Later) */
     .title-slate {
         background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
-        /* Logic: Starts at 0, fades in after 40% scroll */
-        opacity: calc((var(--scroll-progress) * 2.5) - 1);
+        opacity: calc((var(--scroll-progress) * 3) - 1.2); /* Fades in later */
         transform: scale(calc(0.9 + (var(--scroll-progress) * 0.1)));
         filter: blur(calc((1 - var(--scroll-progress)) * 10px));
     }
@@ -130,26 +129,28 @@
       color: #94a3b8;
     }
 
-    /* --- PHONE VISUAL --- */
+    /* --- PHONE VISUAL (Updated Geometry) --- */
     .phone-stage {
       position: relative;
       z-index: 20;
       width: auto;
       height: 75vh; 
-      max-height: 780px;
-      aspect-ratio: 9 / 19; 
-      /* Subtle zoom out effect */
-      transform: scale(calc(1.05 - (var(--scroll-progress) * 0.05)));
+      max-height: 850px;
+      
+      /* Exact iPhone 15 Pro Aspect Ratio (~19.5:9) */
+      aspect-ratio: 9 / 19.5; 
+      
+      /* Animation */
+      transform: scale(calc(1.02 - (var(--scroll-progress) * 0.02)));
     }
 
     .phone-glow {
       position: absolute;
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 150%; height: 100%;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 60%);
-      filter: blur(60px);
-      /* Glow fades out */
+      width: 140%; height: 100%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 60%);
+      filter: blur(50px);
       opacity: calc(1 - var(--scroll-progress)); 
     }
 
@@ -157,62 +158,75 @@
       width: 100%;
       height: 100%;
       background: #000;
-      border-radius: 46px;
+      /* iPhone 15 Pro Corner Radius */
+      border-radius: 50px; 
       box-shadow: 
-        0 0 0 1px #334155,
-        0 20px 60px -10px rgba(0,0,0,0.9);
+        0 0 0 1px #333, /* Bezel */
+        0 0 0 3px #1a1a1a, /* Frame */
+        0 25px 70px -10px rgba(0,0,0,0.9);
       position: relative;
       overflow: hidden;
     }
 
-    .notch {
+    /* Dynamic Island */
+    .dynamic-island {
       position: absolute;
-      top: 18px; left: 50%;
+      top: 11px; left: 50%;
       transform: translateX(-50%);
-      width: 30%; height: 28px;
+      width: 32%; height: 36px;
       background: #000;
       border-radius: 20px;
-      z-index: 50;
+      z-index: 60;
     }
 
     .screen {
       position: absolute;
-      inset: 0;
+      inset: 4px; /* Thin bezel */
       overflow: hidden;
-      border-radius: 42px;
+      border-radius: 46px; /* Match outer radius minus bezel */
       background: #000;
     }
 
     .status-bar {
       position: absolute;
-      top: 20px; left: 26px; right: 26px;
+      top: 14px; left: 28px; right: 28px;
       display: flex;
       justify-content: space-between;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
-      z-index: 40;
+      z-index: 50;
       color: #fff;
     }
 
-    /* LAYER 1: CHAOS */
+    /* --- LAYER 1: CHAOS (Match Image 1) --- */
     .layer-chaos {
       position: absolute;
       inset: 0;
-      padding: 60px 18px 20px;
-      background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+      /* Padding to account for Dynamic Island */
+      padding: 60px 16px 20px;
       
-      /* Fades out */
-      opacity: calc(1 - (var(--scroll-progress) * 1.8));
-      filter: blur(calc(var(--scroll-progress) * 15px));
+      /* Complex Gradient to match the pink/orange/dark blur in your photo */
+      background: linear-gradient(
+        160deg,
+        #4f46e5 0%,
+        #e879f9 25%, 
+        #f97316 60%,
+        #1e1b4b 100%
+      );
+      
+      /* Animation */
+      opacity: calc(1 - (var(--scroll-progress) * 2));
+      filter: blur(calc(var(--scroll-progress) * 20px));
       transform: scale(calc(1 - (var(--scroll-progress) * 0.05)));
       transform-origin: center center;
     }
 
+    /* 4x6 Grid for Chaos Density */
     .app-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px 12px;
-      margin-top: 15px;
+      gap: 14px 10px;
+      margin-top: 10px;
     }
 
     .app-item { display: flex; flex-direction: column; align-items: center; }
@@ -222,30 +236,37 @@
       aspect-ratio: 1/1;
       border-radius: 22%;
       overflow: hidden;
-      margin-bottom: 5px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      margin-bottom: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      background: #000; /* Fallback */
     }
     
     .app-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .app-label {
-      font-size: 11px;
+      font-size: 10px;
       text-align: center;
       color: #fff;
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
+
+    .pagination-dots {
+        position: absolute;
+        bottom: 110px; left: 0; right: 0;
+        display: flex; justify-content: center; gap: 6px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); }
+    .dot.active { background: #fff; }
 
     .dock-glass {
       position: absolute;
-      bottom: 22px; left: 16px; right: 16px;
+      bottom: 14px; left: 14px; right: 14px;
       height: 90px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(20px);
-      border-radius: 38px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 36px;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
@@ -254,40 +275,42 @@
       align-items: center;
     }
 
-    /* LAYER 2: SLATE (Fixed Alignment) */
+    /* --- LAYER 2: SLATE (Match Image 2) --- */
     .layer-slate {
       position: absolute;
       inset: 0;
-      padding: 70px 24px 34px;
-      background: #000;
+      padding: 70px 24px 40px;
+      background: var(--slate-bg);
       display: flex;
       flex-direction: column;
-      align-items: center; /* Centers content horizontally */
       
-      /* Transition Logic */
+      /* Animation Logic */
       opacity: var(--scroll-progress);
-      transform: scale(calc(1.08 - (var(--scroll-progress) * 0.08)));
-      filter: blur(calc((1 - var(--scroll-progress)) * 12px));
+      transform: scale(calc(1.1 - (var(--scroll-progress) * 0.1)));
+      filter: blur(calc((1 - var(--scroll-progress)) * 15px));
     }
 
-    .slate-time {
-      font-size: 4rem;
-      font-weight: 300;
-      text-align: center;
-      color: var(--slate-icon-color);
-      margin-top: 20px;
-      letter-spacing: -1.5px;
-      width: 100%;
+    .slate-time-display {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        position: absolute;
+        top: 14px; left: 28px;
     }
 
-    /* GRID FIX: Constrained width to ensure proper spacing */
+    /* Large Time centered (optional, not in Image 2 but good for aesthetic, removed to match Image 2 strictly) */
+    /* Image 2 shows time top left status bar, so we keep status bar. 
+       The main content is just the grid. */
+    
+    .slate-spacer { flex: 1; } /* Pushes content down slightly */
+
+    /* 2 Rows x 3 Columns Grid */
     .slate-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 30px 24px;
+      gap: 30px 20px; /* Vertical / Horizontal gap */
       width: 100%;
-      max-width: 280px; /* Forces tighter icon grouping like iOS */
-      margin: auto 0; /* Vertically centers the grid */
+      margin-bottom: 40px; /* Space between grid and dock */
     }
 
     .slate-app-item { 
@@ -296,38 +319,59 @@
         align-items: center; 
     }
     
+    /* The Icons (Match Image 2 Style) */
     .slate-icon-box {
-      width: 64px; height: 64px;
+      width: 68px; height: 68px;
       background: var(--slate-icon-bg);
-      border-radius: 20px; /* Slightly squarer for iOS feel */
+      border-radius: 22px; 
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 8px;
+      /* No border, just clean dark grey */
     }
-    .slate-icon-box svg { width: 30px; height: 30px; stroke: var(--slate-icon-color); stroke-width: 2; }
-    .slate-label { color: var(--slate-icon-color); font-size: 12px; font-weight: 500; }
+    
+    /* SVG Styling */
+    .slate-icon-box svg { 
+        width: 32px; height: 32px; 
+        stroke: var(--slate-icon-color); 
+        stroke-width: 2.2; 
+        fill: none;
+    }
+    
+    /* Special case for Fill icons (like Phone handle) */
+    .slate-icon-box svg.fill-icon {
+        fill: var(--slate-icon-color);
+        stroke: none;
+    }
 
-    /* DOCK FIX */
+    .slate-label { 
+        color: var(--slate-icon-color); 
+        font-size: 13px; 
+        font-weight: 600; 
+    }
+
+    /* DOCK (Match Image 2: 4 icons in a rounded rect container) */
     .slate-dock-container {
         width: 100%;
-        max-width: 320px;
-        background: #1c1c1e;
-        border-radius: 38px;
+        background: #1c1c1e; /* Slightly lighter than pure black */
+        border-radius: 40px;
         padding: 18px;
-        margin-top: 20px;
+        margin-top: auto; /* Push to bottom */
     }
     .slate-dock { 
         display: grid; 
         grid-template-columns: repeat(4, 1fr); 
         gap: 15px; 
+        place-items: center;
     }
+    
     .slate-dock-item {
-      width: 100%; 
-      aspect-ratio: 1/1;
+      width: 60px; height: 60px;
       border-radius: 20px;
       background: var(--slate-icon-bg);
       display: flex; align-items: center; justify-content: center;
     }
-    .slate-dock-item svg { width: 26px; height: 26px; stroke: var(--slate-icon-color); stroke-width: 2; fill: none;}
+    .slate-dock-item svg { width: 28px; height: 28px; stroke: #fff; stroke-width: 2.2; fill: none;}
+    .slate-dock-item svg.fill-icon { fill: #fff; stroke: none; }
 
 
     /* --- CONTENT SECTIONS --- */
@@ -371,11 +415,10 @@
 
     /* Mobile adjustments */
     @media (max-width: 768px) {
-      .hero-title { font-size: 2.2rem; }
       .phone-stage { height: 65vh; }
-      .slate-grid { gap: 20px 15px; max-width: 240px; }
+      .slate-grid { gap: 20px 10px; }
       .slate-icon-box { width: 56px; height: 56px; }
-      .slate-icon-box svg { width: 26px; height: 26px; }
+      .slate-dock-item { width: 50px; height: 50px; }
     }
   </style>
 </head>
@@ -400,7 +443,7 @@
       <div class="phone-stage">
         <div class="phone-glow"></div>
         <div class="phone-device">
-          <div class="notch"></div>
+          <div class="dynamic-island"></div>
           
           <div class="screen">
             <div class="status-bar">
@@ -418,56 +461,90 @@
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Podcasts_%28iOS%29.svg" alt=""></div><div class="app-label">Podcasts</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt=""></div><div class="app-label">Spotify</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/5/58/Reddit_logo_new.svg" alt=""></div><div class="app-label">Reddit</div></div>
-                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Gold_coin_icon.png/1200px-Gold_coin_icon.png" alt=""></div><div class="app-label">Crypto</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Gold_coin_icon.png/1200px-Gold_coin_icon.png" alt=""></div><div class="app-label">Crypto</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Linkedin.svg" alt=""></div><div class="app-label">LinkedIn</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/e/ea/Apple_Notes_icon.png" alt=""></div><div class="app-label">Notes</div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/9/9d/Photos_iOS_icon.svg" alt=""></div><div class="app-label">Photos</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Facebook_icon.svg/1024px-Facebook_icon.svg.png" alt=""></div><div class="app-label">Facebook</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Waze_app_logo.png" alt=""></div><div class="app-label">Waze</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Apple_Music_icon.png" alt=""></div><div class="app-label">Music</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Angular_full_color_logo.svg/2048px-Angular_full_color_logo.svg.png" alt=""></div><div class="app-label">Work</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/7/75/Netflix_icon.svg" alt=""></div><div class="app-label">Netflix</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/1200px-McDonald%27s_Golden_Arches.svg.png" style="background:red; padding:4px;" alt=""></div><div class="app-label">Food</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Octicons-mark-github.svg/2048px-Octicons-mark-github.svg.png" style="background:white; padding:2px;" alt=""></div><div class="app-label">Github</div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt=""></div><div class="app-label">WhatsApp</div></div>
               </div>
               
+              <div class="pagination-dots">
+                  <div class="dot active"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+              </div>
+
               <div class="dock-glass">
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Camera_Icon_iOS_14.svg/1024px-Camera_Icon_iOS_14.svg.png" alt=""></div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IMessage_logo.svg" alt=""></div></div>
                 <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Compass_icon_2.svg/1024px-Compass_icon_2.svg.png" alt=""></div></div>
-                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Apple_Music_icon.png" alt=""></div></div>
+                <div class="app-item"><div class="app-icon"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Dribbble_logo_pink.png" style="background:#ea4c89" alt=""></div></div>
               </div>
             </div>
 
             <div class="layer-slate">
-              <div class="slate-time">09:41</div>
+              <div class="slate-spacer"></div>
               
               <div class="slate-grid">
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
                     <span class="slate-label">Clock</span>
                 </div>
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    </div>
                     <span class="slate-label">Maps</span>
                 </div>
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
                     <span class="slate-label">Notes</span>
                 </div>
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg class="fill-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
                     <span class="slate-label">Phone</span>
                 </div>
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg class="fill-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
                     <span class="slate-label">Messages</span>
                 </div>
                 <div class="slate-app-item">
-                    <div class="slate-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+                    <div class="slate-icon-box">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
                     <span class="slate-label">Settings</span>
                 </div>
               </div>
 
               <div class="slate-dock-container">
                 <div class="slate-dock">
-                  <div class="slate-dock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-                  <div class="slate-dock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-                  <div class="slate-dock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-                  <div class="slate-dock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                  <div class="slate-dock-item">
+                      <svg class="fill-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </div>
+                  <div class="slate-dock-item">
+                      <svg class="fill-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                  <div class="slate-dock-item">
+                      <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  </div>
+                  <div class="slate-dock-item">
+                      <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                  </div>
                 </div>
               </div>
 
