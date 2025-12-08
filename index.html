@@ -45,6 +45,7 @@
         flex-direction: column;
         align-items: flex-end;
         gap: 12px;
+        transition: all 0.3s ease; /* Smooth transition for color change */
     }
 
     .sb-label {
@@ -55,7 +56,7 @@
         margin-bottom: 4px;
         color: var(--text-muted);
         opacity: 0.5;
-        transition: opacity 0.3s;
+        transition: opacity 0.3s, color 0.3s;
         text-align: right;
     }
 
@@ -66,7 +67,7 @@
         border-radius: 4px;
         position: relative;
         overflow: hidden;
-        transition: width 0.3s;
+        transition: width 0.3s, background 0.3s;
     }
 
     .sb-segment.active .sb-label { opacity: 1; color: #fff; }
@@ -77,7 +78,7 @@
         background: #fff;
         transform: scaleY(0);
         transform-origin: top center;
-        transition: transform 0.1s linear;
+        transition: transform 0.1s linear, background 0.3s;
     }
 
     /* Sub-segments container */
@@ -96,6 +97,7 @@
         border-radius: 4px;
         position: relative;
         overflow: hidden;
+        transition: background 0.3s;
     }
 
     /* Tooltip text on hover */
@@ -107,6 +109,14 @@
     }
     .sb-wrap:hover .sb-label { opacity: 1; }
     .sb-wrap:hover .sb-segment, .sb-wrap:hover .sb-sub { width: 6px; }
+
+    /* --- DARK MODE SCROLLBAR (NEW) --- */
+    /* Active when scrolling through white section */
+    .custom-scrollbar.dark .sb-label { color: #64748b; }
+    .custom-scrollbar.dark .sb-segment, 
+    .custom-scrollbar.dark .sb-sub { background: rgba(0,0,0,0.1); }
+    .custom-scrollbar.dark .sb-fill { background: #000; }
+    .custom-scrollbar.dark .sb-segment.active .sb-label { color: #000; }
 
 
     /* --- FIXED PHONE --- */
@@ -299,7 +309,7 @@
             <h1 class="hero-title title-chaos" id="text-chaos">tired of distractions?</h1>
             <h1 class="hero-title title-slate" id="text-slate">go DUMB with SLATE</h1>
         </div>
-        <p class="hero-subtitle" id="text-sub">reclaim your time and focus instantly.</p>
+        <p class="hero-subtitle" id="text-sub"> </p>
       </div>
   </section>
 
@@ -366,32 +376,36 @@
     const sbStep3 = document.getElementById('fill-step3');
     const sbJoin  = document.getElementById('fill-join');
 
+    // --- 0. SCROLLBAR COLOR TRIGGER (NEW) ---
+    // Turns scrollbar black when inside the white content section
+    ScrollTrigger.create({
+        trigger: "#section-content",
+        start: "top center",
+        end: "bottom center",
+        toggleClass: { targets: ".custom-scrollbar", className: "dark" }
+    });
+
     // --- 1. HERO PINNED ANIMATION ---
     const heroTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=2000", // Pinned for 2000px
+            end: "+=2000", 
             pin: true,
             scrub: 1,
             onUpdate: (self) => {
-                // Progress is 0 to 1
                 const p = self.progress;
-                
-                // Segment 1 (Chaos): Fills from 0.0 to 0.5
                 if (p <= 0.5) {
                     sbChaos.style.transform = `scaleY(${p * 2})`;
                     sbFocus.style.transform = `scaleY(0)`;
                 } else {
                     sbChaos.style.transform = `scaleY(1)`;
-                    // Segment 2 (Focus): Fills from 0.5 to 1.0
                     sbFocus.style.transform = `scaleY(${(p - 0.5) * 2})`;
                 }
             }
         }
     });
 
-    // Animate Hero Text & Screen
     heroTl.to("#text-chaos", { opacity: 0, scale: 0.9, filter: "blur(10px)", duration: 1 }, 0)
           .to("#text-slate", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1 }, 0.5)
           .to(".hero", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0)
@@ -420,7 +434,7 @@
     moveTl.to("#hero-text", { opacity: 0, y: -50 }, 0);
 
 
-    // --- 3. CARD REVEALS & SUB-SEGMENT FILLING ---
+    // --- 3. CARD REVEALS WITH PAUSE (UPDATED) ---
     const steps = [
         { id: "#card-step1", bar: sbStep1 },
         { id: "#card-step2", bar: sbStep2 },
@@ -428,30 +442,22 @@
     ];
 
     steps.forEach((step) => {
-        // Animation for the card appearing
-        gsap.to(step.id, {
+        // We create a ScrollTrigger that PINS the card briefly to create the "Hold"
+        const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: step.id,
-                start: "top 85%",
-                toggleActions: "play none none reverse"
-            },
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: "power2.out"
+                start: "center center", // Start when card hits center
+                end: "+=400",           // Hold for 400px of scroll
+                pin: true,              // Pin the card (and spacer)
+                scrub: true             // Smooth scrub for the bar fill
+            }
         });
 
-        // Animation for the scrollbar segment filling
-        gsap.to(step.bar, {
-            scrollTrigger: {
-                trigger: step.id,
-                start: "top 60%", // Fill when card is near middle of screen
-                end: "bottom 60%",
-                toggleActions: "play reverse play reverse"
-            },
-            scaleY: 1,
-            duration: 0.2
-        });
+        // 1. Reveal Card Opacity immediately on enter
+        tl.to(step.id, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0);
+        
+        // 2. Fill the progress bar slowly over the duration of the "Hold"
+        tl.to(step.bar, { scaleY: 1, ease: "none", duration: 1 }, 0);
     });
 
 
@@ -466,7 +472,6 @@
         duration: 0.2
     });
 
-    // Phone Exit at CTA
     gsap.to("#global-phone", {
         scrollTrigger: {
             trigger: "#section-cta",
