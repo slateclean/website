@@ -18,26 +18,98 @@
       --bg-dark: #020617;
       --text-white: #f8fafc;
       --text-muted: #94a3b8;
+      --accent: #fff;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
     ::-webkit-scrollbar { display: none; }
+    html { scroll-behavior: smooth; }
     
-    html { scroll-behavior: auto; }
     body { 
-        -ms-overflow-style: none;  
-        scrollbar-width: none; 
         font-family: 'Inter', sans-serif;
         background-color: var(--bg-dark);
         color: var(--text-white);
-        line-height: 1.6;
         overflow-x: hidden;
     }
 
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; }
 
-    /* --- FIXED PHONE WRAPPER --- */
-    /* This sits on top of everything and transitions between sections */
+    /* --- CUSTOM SCROLLBAR --- */
+    .custom-scrollbar {
+        position: fixed;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+    }
+
+    .sb-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+        color: var(--text-muted);
+        opacity: 0.5;
+        transition: opacity 0.3s;
+        text-align: right;
+    }
+
+    .sb-segment {
+        width: 4px;
+        height: 40px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+        transition: width 0.3s;
+    }
+
+    .sb-segment.active .sb-label { opacity: 1; color: #fff; }
+    
+    .sb-fill {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: #fff;
+        transform: scaleY(0);
+        transform-origin: top center;
+        transition: transform 0.1s linear;
+    }
+
+    /* Sub-segments container */
+    .sb-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+        margin-top: 4px;
+    }
+
+    .sb-sub {
+        width: 4px;
+        height: 15px; /* Shorter bars for steps */
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Tooltip text on hover */
+    .sb-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        cursor: pointer;
+    }
+    .sb-wrap:hover .sb-label { opacity: 1; }
+    .sb-wrap:hover .sb-segment, .sb-wrap:hover .sb-sub { width: 6px; }
+
+
+    /* --- FIXED PHONE --- */
     .phone-wrapper-fixed {
         position: fixed;
         top: 0; left: 0;
@@ -47,14 +119,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        /* Start slightly lower to clear the top text */
         padding-top: 5vh; 
     }
 
     .phone-stage {
         position: relative;
-        width: auto;
-        height: 70vh; 
+        width: auto; height: 70vh; 
         max-height: 800px;
         aspect-ratio: 9 / 19.5; 
         will-change: transform;
@@ -73,53 +143,25 @@
         width: 100%; height: 100%;
         background: #000;
         border-radius: 54px; 
-        box-shadow: 
-            0 0 0 1px #333,
-            0 0 0 3px #1a1a1a,
-            0 25px 70px -10px rgba(0,0,0,0.9);
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 0 0 1px #333, 0 0 0 3px #1a1a1a, 0 25px 70px -10px rgba(0,0,0,0.9);
+        position: relative; overflow: hidden;
     }
 
     .dynamic-island {
-        position: absolute;
-        top: 11px; left: 50%;
-        transform: translateX(-50%);
-        width: 30%; height: 15px;
-        background: #000;
-        border-radius: 10px;
-        z-index: 60;
+        position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+        width: 30%; height: 15px; background: #000; border-radius: 10px; z-index: 60;
     }
 
-    .screen {
-        position: absolute; inset: 6px; 
-        overflow: hidden;
-        border-radius: 48px;
-        background: #000;
-    }
+    .screen { position: absolute; inset: 6px; overflow: hidden; border-radius: 48px; background: #000; }
+    .screen-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .layer-chaos { position: absolute; inset: 0; z-index: 2; }
+    .layer-slate { position: absolute; inset: 0; opacity: 0; z-index: 3; }
 
-    .screen-img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        display: block;
-    }
-
-    .layer-chaos {
-        position: absolute; inset: 0; z-index: 2; 
-    }
-    .layer-slate {
-        position: absolute; inset: 0; opacity: 0; z-index: 3;
-    }
-
-    /* --- HERO SECTION --- */
+    /* --- SECTIONS --- */
     .hero {
-      /* We start with 100vh, but GSAP pinning will add spacing automatically */
       height: 100vh; 
       position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      /* Gradient that will animate */
+      display: flex; flex-direction: column; align-items: center;
       background: radial-gradient(circle at 50% 50%, #1e293b, #000000); 
       z-index: 10;
     }
@@ -127,90 +169,44 @@
     .hero-content {
       text-align: center;
       z-index: 40; 
-      /* Position text HIGH up so it is not covered by phone */
-      position: absolute;
-      top: 5%; 
-      width: 100%;
+      position: absolute; top: 5%; width: 100%;
     }
 
     .heading-swapper {
-        display: grid;
-        place-items: center;
-        height: 80px; /* fixed height to prevent jumps */
-        position: relative;
+        display: grid; place-items: center; height: 80px; position: relative;
     }
 
     .hero-title {
       grid-area: 1 / 1;
       font-size: clamp(2rem, 4vw, 3.5rem); 
-      line-height: 1.1;
-      font-weight: 700;
-      margin: 0;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      line-height: 1.1; font-weight: 700; margin: 0;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
-    .title-chaos {
-        background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%);
-    }
+    .title-chaos { background-image: linear-gradient(to bottom right, #ff7878 30%, #a83f3f 100%); }
+    .title-slate { background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%); opacity: 0; }
+    .hero-subtitle { max-width: 480px; margin: 12px auto 0; font-size: 1.05rem; color: #94a3b8; }
 
-    .title-slate {
-        background-image: linear-gradient(to bottom right, #fff 30%, #94a3b8 100%);
-        opacity: 0; 
-    }
-
-    .hero-subtitle {
-      max-width: 480px;
-      margin: 12px auto 0;
-      font-size: 1.05rem;
-      color: #94a3b8;
-    }
-
-    /* --- CONTENT SECTION --- */
+    /* Content */
     .content-section {
-      position: relative;
-      background: #f8fafc;
-      color: #0f172a;
-      min-height: 150vh; 
-      padding: 120px 0;
-      z-index: 40;
-      overflow: hidden; 
+      position: relative; background: #f8fafc; color: #0f172a;
+      min-height: 150vh; padding: 120px 0; z-index: 40; overflow: hidden; 
     }
-
-    .split-layout {
-        display: flex;
-        align-items: flex-start; 
-        justify-content: space-between;
-        margin-top: 60px;
-    }
-
-    .content-left {
-        width: 45%;
-        display: flex;
-        flex-direction: column;
-        gap: 200px; 
-        padding-bottom: 200px;
-    }
-
+    .split-layout { display: flex; align-items: flex-start; justify-content: space-between; margin-top: 60px; }
+    .content-left { width: 45%; display: flex; flex-direction: column; gap: 200px; padding-bottom: 200px; }
     .content-right { width: 50%; }
 
     .card {
       background: #fff; padding: 32px; border-radius: 24px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       opacity: 0; transform: translateY(30px);
     }
-    
     .card h3 { font-size: 1.5rem; margin-bottom: 12px; color: #0f172a; font-weight: 700;}
     .card p { color: #64748b; font-size: 1.1rem; }
     .step-num { font-size: 0.8rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; margin-bottom: 8px; display: block;}
 
-    /* --- CTA SECTION --- */
-    .cta { 
-      background: #000; color: #fff; 
-      text-align: center; padding: 120px 0 160px; 
-      z-index: 60; position: relative;
-    }
+    /* CTA */
+    .cta { background: #000; color: #fff; text-align: center; padding: 120px 0 160px; z-index: 60; position: relative; }
     .btn-buy {
       display: inline-block; margin-top: 30px; margin-bottom: 50px;
       background: #fff; color: #000; padding: 18px 40px; 
@@ -228,6 +224,7 @@
     footer { background: #000; color: #475569; text-align: center; padding: 40px; font-size: 0.9rem; position: relative; z-index: 60; }
 
     @media (max-width: 768px) {
+        .custom-scrollbar { display: none; } /* Hide on mobile */
         .split-layout { flex-direction: column; }
         .content-left { width: 100%; gap: 40px; padding-bottom: 50px;}
         .content-right { display: none; }
@@ -236,6 +233,47 @@
   </style>
 </head>
 <body>
+
+  <div class="custom-scrollbar">
+      
+      <div class="sb-wrap" onclick="window.scrollTo(0,0)">
+          <div class="sb-label">Chaos</div>
+          <div class="sb-segment">
+              <div class="sb-fill" id="fill-chaos"></div>
+          </div>
+      </div>
+
+      <div class="sb-wrap">
+          <div class="sb-label">Focus</div>
+          <div class="sb-segment">
+              <div class="sb-fill" id="fill-focus"></div>
+          </div>
+      </div>
+
+      <div class="sb-wrap" onclick="document.getElementById('section-content').scrollIntoView()">
+          <div class="sb-label">How it Works</div>
+          <div class="sb-group">
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step1"></div>
+              </div>
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step2"></div>
+              </div>
+              <div class="sb-sub">
+                  <div class="sb-fill" id="fill-step3"></div>
+              </div>
+          </div>
+      </div>
+
+      <div class="sb-wrap" onclick="document.getElementById('section-cta').scrollIntoView()">
+          <div class="sb-label">Join</div>
+          <div class="sb-segment">
+              <div class="sb-fill" id="fill-join"></div>
+          </div>
+      </div>
+
+  </div>
+
 
   <div class="phone-wrapper-fixed">
       <div class="phone-stage" id="global-phone">
@@ -254,15 +292,14 @@
       </div>
   </div>
 
+
   <section class="hero" id="hero-section">
       <div class="hero-content container" id="hero-text"> 
         <div class="heading-swapper">
             <h1 class="hero-title title-chaos" id="text-chaos">tired of distractions?</h1>
             <h1 class="hero-title title-slate" id="text-slate">go DUMB with SLATE</h1>
         </div>
-        <p class="hero-subtitle" id="text-sub">
-          reclaim your time and focus instantly.
-        </p>
+        <p class="hero-subtitle" id="text-sub">reclaim your time and focus instantly.</p>
       </div>
   </section>
 
@@ -275,21 +312,25 @@
       
       <div class="split-layout">
         <div class="content-left">
-          <div class="card step-card">
+          
+          <div class="card step-card" id="card-step1">
             <span class="step-num">Step 01</span>
             <h3>Install on Mac</h3>
             <p>Download the SLATE companion app. It acts as the command center for your device.</p>
           </div>
-          <div class="card step-card">
+          
+          <div class="card step-card" id="card-step2">
             <span class="step-num">Step 02</span>
             <h3>Supervise</h3>
             <p>Plug in your iPhone once to enable MDM supervision. It takes 2 minutes and unlocks powerful restriction capabilities.</p>
           </div>
-          <div class="card step-card">
+          
+          <div class="card step-card" id="card-step3">
             <span class="step-num">Step 03</span>
             <h3>Shift</h3>
             <p>Hit the switch. All distracting apps are hidden. Only essentials remain. Your phone is now a tool.</p>
           </div>
+
         </div>
 
         <div class="content-right"></div>
@@ -301,9 +342,7 @@
     <div class="container reveal-cta">
       <h2 style="font-size:3rem; margin-bottom:10px;">Ready to go dumb?</h2>
       <a href="#" class="btn-buy" onclick="return false;">Get SLATE for $99</a>
-      
       <div class="divider" style="margin: 30px 0; color:#555; font-size:0.8rem; text-transform:uppercase;">or join waitlist</div>
-
       <form id="waitlist-form" action="https://formspree.io/f/mrbnaykd" method="POST" class="waitlist-group">
         <input type="text" name="name" class="waitlist-input" placeholder="Your Name" required>
         <input type="email" name="email" class="waitlist-input" placeholder="email@address.com" required>
@@ -319,57 +358,80 @@
   <script>
     gsap.registerPlugin(ScrollTrigger);
 
-    // --- PHASE 1: HERO TRANSFORMATION (PINNED) ---
-    // The user scrolls, but the page stays put while the animation happens.
+    // --- ELEMENTS FOR SCROLLBAR ---
+    const sbChaos = document.getElementById('fill-chaos');
+    const sbFocus = document.getElementById('fill-focus');
+    const sbStep1 = document.getElementById('fill-step1');
+    const sbStep2 = document.getElementById('fill-step2');
+    const sbStep3 = document.getElementById('fill-step3');
+    const sbJoin  = document.getElementById('fill-join');
+
+    // --- 1. HERO PINNED ANIMATION ---
     const heroTl = gsap.timeline({
         scrollTrigger: {
             trigger: ".hero",
             start: "top top",
-            end: "+=1500", // Length of the 'pause' to let animation finish
-            pin: true,     // Locks the section in place
-            scrub: 1,      // Smooth scrubbing
+            end: "+=2000", // Pinned for 2000px
+            pin: true,
+            scrub: 1,
+            onUpdate: (self) => {
+                // Progress is 0 to 1
+                const p = self.progress;
+                
+                // Segment 1 (Chaos): Fills from 0.0 to 0.5
+                if (p <= 0.5) {
+                    sbChaos.style.transform = `scaleY(${p * 2})`;
+                    sbFocus.style.transform = `scaleY(0)`;
+                } else {
+                    sbChaos.style.transform = `scaleY(1)`;
+                    // Segment 2 (Focus): Fills from 0.5 to 1.0
+                    sbFocus.style.transform = `scaleY(${(p - 0.5) * 2})`;
+                }
+            }
         }
     });
 
-    // Animate Text & Screen Crossfade
+    // Animate Hero Text & Screen
     heroTl.to("#text-chaos", { opacity: 0, scale: 0.9, filter: "blur(10px)", duration: 1 }, 0)
           .to("#text-slate", { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1 }, 0.5)
-          .to("#hero-section", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0)
+          .to(".hero", { background: "radial-gradient(circle at 50% 50%, #000000, #000000)", duration: 2}, 0)
           .to("#screen-chaos", { opacity: 0, filter: "blur(5px)", duration: 1 }, 0)
           .to("#screen-slate", { opacity: 1, filter: "blur(0px)", duration: 1 }, 0.5)
           .to("#phone-glow", { opacity: 0, duration: 1 }, 0);
 
 
-    // --- PHASE 2: MOVEMENT TO RIGHT ---
-    // This happens AFTER the Hero unpins and the "Content" section enters view.
+    // --- 2. MOVE PHONE TO RIGHT ---
     const moveTl = gsap.timeline({
         scrollTrigger: {
             trigger: "#section-content",
-            start: "top bottom", // Start when content section appears at bottom of screen
-            end: "top top",      // End when content section hits top of screen
+            start: "top bottom",
+            end: "top top",
             scrub: 1,
         }
     });
 
-    // Move Phone Center -> Right
     moveTl.to("#global-phone", {
-        x: "25vw",      // Move right
-        y: "10vh",      // Move down slightly to center in the white space
-        scale: 0.85,    // Shrink
-        rotation: -2,
+        x: "25vw", 
+        y: "10vh",
+        scale: 0.85, 
+        rotation: -2, 
         ease: "power2.inOut"
     }, 0);
-
-    // Fade out Hero Text so it doesn't clutter the transition
     moveTl.to("#hero-text", { opacity: 0, y: -50 }, 0);
 
 
-    // --- PHASE 3: CARD REVEALS ---
-    const cards = document.querySelectorAll('.step-card');
-    cards.forEach((card) => {
-        gsap.to(card, {
+    // --- 3. CARD REVEALS & SUB-SEGMENT FILLING ---
+    const steps = [
+        { id: "#card-step1", bar: sbStep1 },
+        { id: "#card-step2", bar: sbStep2 },
+        { id: "#card-step3", bar: sbStep3 }
+    ];
+
+    steps.forEach((step) => {
+        // Animation for the card appearing
+        gsap.to(step.id, {
             scrollTrigger: {
-                trigger: card,
+                trigger: step.id,
                 start: "top 85%",
                 toggleActions: "play none none reverse"
             },
@@ -378,16 +440,40 @@
             duration: 0.6,
             ease: "power2.out"
         });
+
+        // Animation for the scrollbar segment filling
+        gsap.to(step.bar, {
+            scrollTrigger: {
+                trigger: step.id,
+                start: "top 60%", // Fill when card is near middle of screen
+                end: "bottom 60%",
+                toggleActions: "play reverse play reverse"
+            },
+            scaleY: 1,
+            duration: 0.2
+        });
     });
 
-    // --- PHASE 4: EXIT ---
+
+    // --- 4. JOIN (CTA) SEGMENT ---
+    gsap.to(sbJoin, {
+        scrollTrigger: {
+            trigger: "#section-cta",
+            start: "top 70%",
+            toggleActions: "play reverse play reverse"
+        },
+        scaleY: 1,
+        duration: 0.2
+    });
+
+    // Phone Exit at CTA
     gsap.to("#global-phone", {
         scrollTrigger: {
             trigger: "#section-cta",
             start: "top bottom",
             scrub: 1
         },
-        y: "-120vh", // Fly out
+        y: "-120vh",
         opacity: 0
     });
 
